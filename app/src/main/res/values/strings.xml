@@ -45,4 +45,11 @@
     <!-- Data Error Messages -->
     <string name="server_error">Unexpected server error occurred</string>
     <string name="unknown_error">Unexpected error occurred</string>
+    
+    <!-- Auth Screen Additional Strings -->
+    <string name="app_logo">★ Kontext</string>
+    <string name="google_icon">G</string>
+    <string name="auth_email_validation_error">Please enter a valid email address</string>
+    <string name="auth_failed_error">Authentication failed</string>
+    <string name="google_signin_error">Google sign-in failed</string>
 </resources>
