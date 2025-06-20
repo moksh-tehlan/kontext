@@ -80,7 +80,6 @@ private fun AuthScreenView(
             modifier = Modifier
                 .fillMaxSize()
                 .background(AuthBackgroundDark)
-                .systemBarsPadding()
                 .padding(paddingValues)
         ) {
             Column(
