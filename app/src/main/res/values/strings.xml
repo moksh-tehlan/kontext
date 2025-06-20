@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Kontext</string>
+    
+    <!-- Auth Screen Strings -->
+    <string name="auth_title">Do your best work\nwith Kontext</string>
+    <string name="auth_subtitle">Enter your email address to get started</string>
+    <string name="email_placeholder">name@yourcompany.com</string>
+    <string name="continue_with_email">Continue with Email</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="or_divider">OR</string>
+    
+    <!-- Terms and Privacy -->
+    <string name="terms_privacy_text">By continuing, you agree to Anthropic\'s Consumer Terms and Usage Policy, and acknowledge their Privacy Policy.</string>
+    <string name="consumer_terms">Consumer Terms</string>
+    <string name="usage_policy">Usage Policy</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    
+    <!-- Validation Messages -->
+    <string name="invalid_email_error">Please enter a valid email address</string>
+    <string name="general_error">An error occurred</string>
+    <string name="google_signin_failed">Google sign-in failed</string>
+    
+    <!-- Common -->
+    <string name="loading">Loading</string>
+    <string name="app_logo_description">App Logo</string>
+    
+    <!-- Company -->
+    <string name="company_name">KONTEXT</string>
+    
+    <!-- Register Screen Strings -->
+    <string name="register_title">Create your account</string>
+    <string name="register_subtitle">Sign up to get started with Kontext</string>
+    <string name="full_name_label">Full Name</string>
+    <string name="password_label">Password</string>
+    <string name="confirm_password_label">Confirm Password</string>
+    <string name="sign_up_button">Sign Up</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="sign_in_button">Sign In</string>
+    
+    <!-- Validation Messages for Register -->
+    <string name="name_required_error">Name is required</string>
+    <string name="password_too_short_error">Password must be at least 6 characters</string>
+    <string name="passwords_dont_match_error">Passwords don\'t match</string>
+
+    <!-- Data Error Messages -->
+    <string name="server_error">Unexpected server error occurred</string>
+    <string name="unknown_error">Unexpected error occurred</string>
+</resources>
