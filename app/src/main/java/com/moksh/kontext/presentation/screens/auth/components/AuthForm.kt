@@ -43,29 +43,20 @@ fun AuthForm(
             keyboardType = KeyboardType.Email,
             textColor = AuthTextPrimary,
             borderColor = OutlineDark,
-            modifier = Modifier.padding(horizontal = 16.dp)
         )
         
         KontextButton(
             text = stringResource(R.string.continue_with_email),
             onClick = onContinueWithEmail,
             isLoading = isEmailLoading,
-            backgroundColor = Primary,
-            textColor = OnPrimary,
-            modifier = Modifier.padding(horizontal = 16.dp)
         )
         
         OrDivider(
-            modifier = Modifier.padding(horizontal = 16.dp)
         )
         
         GoogleSignInButton(
             onClick = onContinueWithGoogle,
             isLoading = isGoogleLoading,
-            backgroundColor = MaterialTheme.colorScheme.surface,
-            textColor = AuthTextPrimary,
-            borderColor = OutlineDark,
-            modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
 }

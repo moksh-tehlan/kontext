@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -71,26 +72,25 @@ private fun AuthScreenView(
     
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = AuthBackgroundDark
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(AuthBackgroundDark)
                 .padding(paddingValues)
+                .padding(horizontal = 24.dp,)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(24.dp),
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(48.dp))
-                
+
                 AuthHeader()
                 
-                Spacer(modifier = Modifier.height(48.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 
                 AuthForm(
                     email = state.email,
@@ -101,10 +101,10 @@ private fun AuthScreenView(
                     isGoogleLoading = state.isGoogleLoading
                 )
                 
-                Spacer(modifier = Modifier.weight(1f))
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 
                 AuthFooter(
+                    modifier = Modifier.fillMaxSize(),
                     onTermsClick = { action(AuthScreenActions.OnTermsClick) },
                     onUsagePolicyClick = { action(AuthScreenActions.OnUsagePolicyClick) },
                     onPrivacyPolicyClick = { action(AuthScreenActions.OnPrivacyPolicyClick) }

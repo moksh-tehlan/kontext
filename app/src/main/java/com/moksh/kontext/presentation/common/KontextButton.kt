@@ -19,8 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moksh.kontext.presentation.core.theme.KontextTheme
-import com.moksh.kontext.presentation.core.theme.OnPrimary
-import com.moksh.kontext.presentation.core.theme.Primary
 
 @Composable
 fun KontextButton(
@@ -29,8 +27,8 @@ fun KontextButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isLoading: Boolean = false,
-    backgroundColor: Color = Primary,
-    textColor: Color = OnPrimary,
+    backgroundColor: Color = MaterialTheme.colorScheme.onBackground,
+    textColor: Color = MaterialTheme.colorScheme.background,
     disabledBackgroundColor: Color = backgroundColor.copy(alpha = 0.5f),
     disabledTextColor: Color = textColor.copy(alpha = 0.5f)
 ) {

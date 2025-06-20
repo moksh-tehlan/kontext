@@ -2,6 +2,7 @@ package com.moksh.kontext.presentation.screens.auth.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +27,6 @@ fun AuthHeader(
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Kontext logo placeholder - you can add the actual logo here
         Text(
@@ -34,25 +34,23 @@ fun AuthHeader(
             style = MaterialTheme.typography.headlineMedium.copy(
                 fontWeight = FontWeight.Bold
             ),
-            color = AuthTextPrimary
+            color = MaterialTheme.colorScheme.onSurface
         )
-        
         Text(
             text = stringResource(R.string.auth_title),
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontWeight = FontWeight.SemiBold
             ),
-            color = AuthTextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
         )
-        
+
+
         Text(
             text = stringResource(R.string.auth_subtitle),
             style = MaterialTheme.typography.bodyLarge,
-            color = AuthTextSecondary,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
 }

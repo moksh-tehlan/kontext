@@ -2,7 +2,9 @@ package com.moksh.kontext.presentation.screens.auth.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.moksh.kontext.R
 import com.moksh.kontext.presentation.core.theme.AuthTextSecondary
 import com.moksh.kontext.presentation.core.theme.KontextTheme
+import java.nio.file.WatchEvent
 
 @Composable
 fun AuthFooter(
@@ -34,7 +37,6 @@ fun AuthFooter(
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         val termsText = buildAnnotatedString {
             append("By continuing, you agree to Anthropic's ")
@@ -42,6 +44,7 @@ fun AuthFooter(
             pushStringAnnotation(tag = "consumer_terms", annotation = "consumer_terms")
             withStyle(
                 style = SpanStyle(
+                    color = MaterialTheme.colorScheme.onSurface,
                     textDecoration = TextDecoration.Underline,
                     fontWeight = FontWeight.Medium
                 )
@@ -55,6 +58,7 @@ fun AuthFooter(
             pushStringAnnotation(tag = "usage_policy", annotation = "usage_policy")
             withStyle(
                 style = SpanStyle(
+                    color = MaterialTheme.colorScheme.onSurface,
                     textDecoration = TextDecoration.Underline,
                     fontWeight = FontWeight.Medium
                 )
@@ -68,6 +72,7 @@ fun AuthFooter(
             pushStringAnnotation(tag = "privacy_policy", annotation = "privacy_policy")
             withStyle(
                 style = SpanStyle(
+                    color = MaterialTheme.colorScheme.onSurface,
                     textDecoration = TextDecoration.Underline,
                     fontWeight = FontWeight.Medium
                 )
@@ -78,14 +83,12 @@ fun AuthFooter(
             
             append(".")
         }
-        
         ClickableText(
             text = termsText,
             style = MaterialTheme.typography.bodySmall.copy(
-                color = AuthTextSecondary,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
             ),
-            modifier = Modifier.padding(horizontal = 16.dp),
             onClick = { offset ->
                 termsText.getStringAnnotations(tag = "consumer_terms", start = offset, end = offset)
                     .firstOrNull()?.let { onTermsClick() }
@@ -97,14 +100,13 @@ fun AuthFooter(
                     .firstOrNull()?.let { onPrivacyPolicyClick() }
             }
         )
-        
         Text(
             text = stringResource(R.string.company_name),
             style = MaterialTheme.typography.labelMedium.copy(
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp
             ),
-            color = AuthTextSecondary
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
         )
     }
 }

@@ -32,8 +32,8 @@ fun GoogleSignInButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isLoading: Boolean = false,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    textColor: Color = MaterialTheme.colorScheme.onSurface,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    textColor: Color = MaterialTheme.colorScheme.onBackground,
     borderColor: Color = MaterialTheme.colorScheme.outline
 ) {
     Button(
@@ -49,7 +49,7 @@ fun GoogleSignInButton(
             disabledContainerColor = backgroundColor.copy(alpha = 0.5f),
             disabledContentColor = textColor.copy(alpha = 0.5f)
         ),
-        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+//        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

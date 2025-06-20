@@ -24,8 +24,8 @@ import com.moksh.kontext.presentation.core.theme.KontextTheme
 @Composable
 fun OrDivider(
     modifier: Modifier = Modifier,
-    dividerColor: Color = AuthTextSecondary.copy(alpha = 0.3f),
-    textColor: Color = AuthTextSecondary
+    dividerColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+    textColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
