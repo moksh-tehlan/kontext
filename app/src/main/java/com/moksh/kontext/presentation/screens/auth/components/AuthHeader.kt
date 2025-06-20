@@ -3,7 +3,9 @@ package com.moksh.kontext.presentation.screens.auth.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,6 +38,7 @@ fun AuthHeader(
             ),
             color = MaterialTheme.colorScheme.onSurface
         )
+        Spacer(modifier = Modifier.fillMaxHeight(.15f))
         Text(
             text = stringResource(R.string.auth_title),
             style = MaterialTheme.typography.headlineLarge.copy(
@@ -44,11 +47,10 @@ fun AuthHeader(
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
         )
-
-
+        Spacer(modifier = Modifier.fillMaxHeight(.1f))
         Text(
             text = stringResource(R.string.auth_subtitle),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,
         )

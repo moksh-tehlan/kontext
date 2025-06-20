@@ -37,6 +37,7 @@ fun AuthFooter(
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
         val termsText = buildAnnotatedString {
             append("By continuing, you agree to Anthropic's ")

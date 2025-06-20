@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -52,9 +53,9 @@ fun KontextButton(
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
+                    modifier = Modifier.size(32.dp),
                     color = textColor,
                     strokeWidth = 2.dp,
-                    modifier = Modifier.padding(2.dp)
                 )
             } else {
                 Text(

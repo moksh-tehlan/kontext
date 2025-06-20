@@ -71,12 +71,10 @@ fun GoogleSignInButton(
                 )
             } else {
                 // Google icon placeholder - you'll need to add the actual Google icon drawable
-                Text(
-                    text = stringResource(R.string.google_icon),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = Color(0xFF4285F4)
+                Image(
+                    modifier = Modifier.size(22.dp),
+                    imageVector = googleLogo,
+                    contentDescription = stringResource(R.string.google_logo_description),
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(

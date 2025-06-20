@@ -52,4 +52,5 @@
     <string name="auth_email_validation_error">Please enter a valid email address</string>
     <string name="auth_failed_error">Authentication failed</string>
     <string name="google_signin_error">Google sign-in failed</string>
+    <string name="google_logo_description">Google logo</string>
 </resources>
