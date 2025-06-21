@@ -75,9 +75,9 @@ class AuthScreenViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 // TODO: Implement actual email authentication
-                // For now, just simulate success
+                // For now, just simulate sending OTP to email
                 kotlinx.coroutines.delay(1000)
-                _authEvents.emit(AuthScreenEvents.NavigateToHome)
+                _authEvents.emit(AuthScreenEvents.NavigateToOtp(email))
             } catch (e: Exception) {
                 _authState.value = _authState.value.copy(
                     emailError = context.getString(R.string.auth_failed_error)

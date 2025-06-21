@@ -35,6 +35,8 @@ import com.moksh.kontext.presentation.screens.auth.viewmodel.AuthScreenViewModel
 
 @Composable
 fun AuthScreen(
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToOtp: (String) -> Unit = {},
     viewModel: AuthScreenViewModel = hiltViewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -45,7 +47,10 @@ fun AuthScreen(
                 // Handle error display in the UI layer if needed
             }
             is AuthScreenEvents.NavigateToHome -> {
-                // Handle navigation to home screen
+                onNavigateToHome()
+            }
+            is AuthScreenEvents.NavigateToOtp -> {
+                onNavigateToOtp(event.email)
             }
         }
     }

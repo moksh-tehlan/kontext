@@ -8,3 +8,7 @@ import com.moksh.kontext.R
 val googleLogo: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.google_logo)
+
+val sendIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.send_icon)

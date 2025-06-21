@@ -4,4 +4,5 @@ package com.moksh.kontext.presentation.screens.auth.viewmodel
 sealed interface AuthScreenEvents {
     data class ShowError(val message: String) : AuthScreenEvents
     data object NavigateToHome : AuthScreenEvents
+    data class NavigateToOtp(val email: String) : AuthScreenEvents
 }

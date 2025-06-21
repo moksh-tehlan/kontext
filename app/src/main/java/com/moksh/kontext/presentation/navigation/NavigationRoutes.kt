@@ -1,14 +1,35 @@
 package com.moksh.kontext.presentation.navigation
 
-// String-based navigation routes for compatibility with navigation 2.7.7
-object Graphs {
-    const val AuthGraph = "auth_graph"
-    const val HomeGraph = "home_graph"
+import kotlinx.serialization.Serializable
+
+interface Routes
+
+sealed interface Graphs : Routes {
+    @Serializable
+    data object AuthGraph : Graphs
+
+    @Serializable
+    data object HomeGraph : Graphs
 }
 
-object Screen {
-    const val Auth = "auth_screen"
-    const val Home = "home_screen"
-    const val Profile = "profile_screen"
-    const val Settings = "settings_screen"
+sealed interface AuthRoutes : Routes {
+
+    @Serializable
+    data object AuthScreen : AuthRoutes
+
+    @Serializable
+    data class OtpScreen(val email: String) :
+        AuthRoutes
+}
+
+sealed interface HomeRoutes : Routes {
+
+    @Serializable
+    data object HomeScreen : HomeRoutes
+
+    @Serializable
+    data object ProfileScreen : HomeRoutes
+
+    @Serializable
+    data object SettingsScreen : HomeRoutes
 }

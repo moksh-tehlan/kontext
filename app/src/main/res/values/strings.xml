@@ -53,4 +53,22 @@
     <string name="auth_failed_error">Authentication failed</string>
     <string name="google_signin_error">Google sign-in failed</string>
     <string name="google_logo_description">Google logo</string>
+    
+    <!-- OTP Screen Strings -->
+    <string name="otp_title">Enter verification code</string>
+    <string name="otp_subtitle_part1">We sent your email to</string>
+    <string name="otp_subtitle_part2">If you received a code you can enter it</string>
+    <string name="change_email">Change email</string>
+    <string name="verify_code">Verify Code</string>
+    <string name="didnt_receive_code">Didn\'t receive a code?</string>
+    <string name="resend_code">Resend code</string>
+    <string name="resend_in">Resend in</string>
+    <string name="sending_code">Sending code...</string>
+    <string name="back_button">Back</string>
+    
+    <!-- OTP Validation Messages -->
+    <string name="otp_validation_error">Please enter a 6-digit verification code</string>
+    <string name="otp_verification_failed">Invalid verification code. Please try again.</string>
+    <string name="otp_resend_failed">Failed to resend code. Please try again.</string>
+    <string name="otp_resent_success">Verification code sent successfully</string>
 </resources>
