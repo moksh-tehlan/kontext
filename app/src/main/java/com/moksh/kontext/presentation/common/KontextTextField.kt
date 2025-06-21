@@ -1,7 +1,6 @@
 package com.moksh.kontext.presentation.common
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,6 +34,7 @@ fun KontextTextField(
     textAlign: TextAlign = TextAlign.Start,
     placeholderColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
     enabled: Boolean = true,
+    maxLines: Int = 1,
 ) {
     OutlinedTextField(
         value = value,
@@ -69,7 +69,8 @@ fun KontextTextField(
             disabledTextColor = placeholderColor,
         ),
         shape = RoundedCornerShape(8.dp),
-        singleLine = true,
+        singleLine = if (maxLines == 1) true else false,
+        maxLines = maxLines,
         enabled = enabled
     )
 }

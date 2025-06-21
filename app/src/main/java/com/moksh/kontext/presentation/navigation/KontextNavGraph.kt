@@ -8,23 +8,19 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import androidx.navigation.toRoute
 import com.moksh.kontext.presentation.screens.auth.AuthScreen
 import com.moksh.kontext.presentation.screens.home.HomeScreen
 import com.moksh.kontext.presentation.screens.otp.OtpScreen
-import com.moksh.kontext.presentation.screens.profile.ProfileScreen
-import com.moksh.kontext.presentation.screens.settings.SettingsScreen
 
 @Composable
 fun KontextNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: Routes = Graphs.AuthGraph
+    startDestination: Routes = Graphs.HomeGraph
 ) {
     NavHost(
         navController = navController,
@@ -99,8 +95,7 @@ fun KontextNavGraph(
         ) {
             composable<HomeRoutes.HomeScreen> {
                 HomeScreen(
-                    onNavigateToProfile = {},
-                    onNavigateToSettings = {}
+
                 )
             }
 
