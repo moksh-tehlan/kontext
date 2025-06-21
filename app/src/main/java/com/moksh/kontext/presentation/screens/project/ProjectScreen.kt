@@ -29,13 +29,19 @@ import com.moksh.kontext.presentation.screens.project.components.CustomInstructi
 import com.moksh.kontext.presentation.screens.project.components.ProjectKnowledge
 
 @Composable
-fun ProjectScreen() {
-    ProjectScreenView()
+fun ProjectScreen(
+    onNavigateBack: () -> Unit = {}
+) {
+    ProjectScreenView(
+        onNavigateBack = onNavigateBack
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectScreenView() {
+fun ProjectScreenView(
+    onNavigateBack: () -> Unit = {}
+) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState()
     )
@@ -53,7 +59,7 @@ fun ProjectScreenView() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             modifier = Modifier.size(28.dp),
                             imageVector = backArrowIcon,

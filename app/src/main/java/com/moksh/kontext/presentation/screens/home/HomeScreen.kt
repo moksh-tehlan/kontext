@@ -113,13 +113,12 @@ fun HomeScreenView(
         topBar = {
             TopAppBar(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
+                    .fillMaxWidth(),
                 title = {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = "Projects",
-                        textAlign = TextAlign.Center,
+                        textAlign = TextAlign.Start,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -160,6 +159,7 @@ fun HomeScreenView(
         ) {
             Spacer(modifier = Modifier.height(10.dp))
             HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 14.dp),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 thickness = 0.5.dp
             )

@@ -116,7 +116,9 @@ fun KontextNavGraph(
             }
             composable<HomeRoutes.ProjectScreen> {
                 ProjectScreen(
-
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
 
