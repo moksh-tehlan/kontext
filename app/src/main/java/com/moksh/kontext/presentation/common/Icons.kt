@@ -24,3 +24,24 @@ val projectIcon: ImageVector
 val backArrowIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.back_arrow)
+
+val infoIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.info_icon)
+
+val profileIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.profile_icon)
+
+val billingIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.billing_icon)
+
+val hapticFeedback: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.haptic_feedback_icon)
+
+val logoutIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.logout_icon)
+

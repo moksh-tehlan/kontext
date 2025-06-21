@@ -19,6 +19,7 @@ import com.moksh.kontext.presentation.screens.home.HomeScreen
 import com.moksh.kontext.presentation.screens.otp.OtpScreen
 import com.moksh.kontext.presentation.screens.profile.ProfileScreen
 import com.moksh.kontext.presentation.screens.project.ProjectScreen
+import com.moksh.kontext.presentation.screens.settings.SettingsScreen
 
 @Composable
 fun KontextNavGraph(
@@ -95,7 +96,7 @@ fun KontextNavGraph(
         }
 
         navigation<Graphs.HomeGraph>(
-            startDestination = HomeRoutes.ProfileScreen
+            startDestination = HomeRoutes.SettingsScreen
         ) {
             composable<HomeRoutes.HomeScreen> {
                 HomeScreen(
@@ -124,6 +125,10 @@ fun KontextNavGraph(
                         }
                     }
                 )
+            }
+
+            composable<HomeRoutes.SettingsScreen> {
+                SettingsScreen()
             }
         }
     }
