@@ -75,7 +75,8 @@ fun ProjectScreenView() {
             contentPadding = PaddingValues(
                 start = 16.dp,
                 end = 16.dp,
-                top = innerPadding.calculateTopPadding()
+                top = innerPadding.calculateTopPadding(),
+                bottom = innerPadding.calculateBottomPadding()
             ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
