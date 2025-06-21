@@ -57,8 +57,16 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
                 updateProfile()
             }
 
-            is ProfileActions.DeleteAccount -> {
+            is ProfileActions.ShowDeleteAccountDialog -> {
+                _state.value = _state.value.copy(showDeleteAccountDialog = true)
+            }
+
+            is ProfileActions.ConfirmDeleteAccount -> {
                 deleteAccount()
+            }
+
+            is ProfileActions.DismissDeleteAccountDialog -> {
+                _state.value = _state.value.copy(showDeleteAccountDialog = false)
             }
 
             is ProfileActions.NavigateBack -> {
@@ -116,11 +124,15 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
 
     private fun deleteAccount() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isDeleting = true, errorMessage = null)
+            _state.value = _state.value.copy(
+                isDeleting = true,
+                errorMessage = null,
+                showDeleteAccountDialog = false
+            )
             try {
                 // TODO: Delete user account via repository
-                // Simulate API call
-                kotlinx.coroutines.delay(1000)
+                // Remove all user data, sessions, etc.
+                kotlinx.coroutines.delay(1500) // Simulate API call
 
                 _state.value = _state.value.copy(isDeleting = false)
                 _events.emit(ProfileEvents.NavigateToAuth)

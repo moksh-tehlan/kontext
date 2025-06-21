@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.moksh.kontext.presentation.common.ConfirmationDialog
 import com.moksh.kontext.presentation.common.backArrowIcon
 import com.moksh.kontext.presentation.common.billingIcon
 import com.moksh.kontext.presentation.common.hapticFeedback
@@ -191,9 +192,23 @@ fun SettingsScreenContent(
                         contentDescription = "logout icon"
                     )
                 },
-                onClick = { onAction(SettingsActions.Logout) }
+                onClick = { onAction(SettingsActions.ShowLogoutDialog) }
             )
         }
+
+        // Logout Confirmation Dialog
+        ConfirmationDialog(
+            isVisible = state.showLogoutDialog,
+            title = "Logout",
+            message = "Are you sure you want to logout? You'll need to sign in again to access your account.",
+            confirmText = "Logout",
+            cancelText = "Cancel",
+            icon = logoutIcon,
+            isDestructive = true,
+            isLoading = state.isLoggingOut,
+            onConfirm = { onAction(SettingsActions.ConfirmLogout) },
+            onCancel = { onAction(SettingsActions.DismissLogoutDialog) }
+        )
     }
 }
 

@@ -10,6 +10,8 @@ sealed interface SettingsActions {
     data object NavigateToBilling : SettingsActions
     data object NavigateToUpgrade : SettingsActions
     data object ToggleHapticFeedback : SettingsActions
-    data object Logout : SettingsActions
+    data object ShowLogoutDialog : SettingsActions
+    data object ConfirmLogout : SettingsActions
+    data object DismissLogoutDialog : SettingsActions
     data object ClearError : SettingsActions
 }

@@ -64,8 +64,16 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
                 toggleHapticFeedback()
             }
 
-            is SettingsActions.Logout -> {
+            is SettingsActions.ShowLogoutDialog -> {
+                _state.value = _state.value.copy(showLogoutDialog = true)
+            }
+
+            is SettingsActions.ConfirmLogout -> {
                 logout()
+            }
+
+            is SettingsActions.DismissLogoutDialog -> {
+                _state.value = _state.value.copy(showLogoutDialog = false)
             }
 
             is SettingsActions.ClearError -> {
@@ -120,7 +128,11 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
 
     private fun logout() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoggingOut = true, errorMessage = null)
+            _state.value = _state.value.copy(
+                isLoggingOut = true,
+                errorMessage = null,
+                showLogoutDialog = false
+            )
             try {
                 // TODO: Logout user via repository
                 // Clear user session, tokens, etc.
@@ -137,4 +149,5 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
+
 }

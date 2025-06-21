@@ -33,9 +33,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.moksh.kontext.presentation.common.ConfirmationDialog
 import com.moksh.kontext.presentation.common.KontextButton
 import com.moksh.kontext.presentation.common.KontextTextField
 import com.moksh.kontext.presentation.common.backArrowIcon
+import com.moksh.kontext.presentation.common.deleteIcon
 import com.moksh.kontext.presentation.core.theme.AuthTextSecondary
 import com.moksh.kontext.presentation.core.theme.KontextTheme
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
@@ -169,7 +171,7 @@ fun ProfileScreenContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onAction(ProfileActions.DeleteAccount) },
+                    .clickable { onAction(ProfileActions.ShowDeleteAccountDialog) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -186,6 +188,20 @@ fun ProfileScreenContent(
                 )
             }
         }
+
+        // Delete Account Confirmation Dialog
+        ConfirmationDialog(
+            isVisible = state.showDeleteAccountDialog,
+            title = "Delete Account",
+            message = "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.",
+            confirmText = "Delete Account",
+            cancelText = "Cancel",
+            icon = deleteIcon,
+            isDestructive = true,
+            isLoading = state.isDeleting,
+            onConfirm = { onAction(ProfileActions.ConfirmDeleteAccount) },
+            onCancel = { onAction(ProfileActions.DismissDeleteAccountDialog) }
+        )
     }
 }
 

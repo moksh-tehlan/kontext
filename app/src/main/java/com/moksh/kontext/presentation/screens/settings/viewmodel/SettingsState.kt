@@ -6,5 +6,6 @@ data class SettingsState(
     val isHapticFeedbackEnabled: Boolean = true,
     val isLoading: Boolean = false,
     val isLoggingOut: Boolean = false,
+    val showLogoutDialog: Boolean = false,
     val errorMessage: String? = null
 )
