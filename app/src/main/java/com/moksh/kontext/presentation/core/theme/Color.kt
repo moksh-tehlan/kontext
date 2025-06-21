@@ -25,7 +25,7 @@ val SurfaceDark = Color(0xFF262624) // Slightly lighter dark surface
 val OnSurfaceDark = Color(0xFFFAF9F5)
 
 // Error Colors
-val Error = Color(0xFFB00020)
+val Error = Color(0xFFFF5A5A)
 val OnError = Color.White
 
 // Additional Auth Screen Colors

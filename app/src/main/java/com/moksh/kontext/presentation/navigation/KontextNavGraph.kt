@@ -17,6 +17,7 @@ import androidx.navigation.compose.navigation
 import com.moksh.kontext.presentation.screens.auth.AuthScreen
 import com.moksh.kontext.presentation.screens.home.HomeScreen
 import com.moksh.kontext.presentation.screens.otp.OtpScreen
+import com.moksh.kontext.presentation.screens.profile.ProfileScreen
 import com.moksh.kontext.presentation.screens.project.ProjectScreen
 
 @Composable
@@ -94,7 +95,7 @@ fun KontextNavGraph(
         }
 
         navigation<Graphs.HomeGraph>(
-            startDestination = HomeRoutes.HomeScreen
+            startDestination = HomeRoutes.ProfileScreen
         ) {
             composable<HomeRoutes.HomeScreen> {
                 HomeScreen(
@@ -108,6 +109,21 @@ fun KontextNavGraph(
             }
             composable<HomeRoutes.ProjectScreen> {
                 ProjectScreen()
+            }
+
+            composable<HomeRoutes.ProfileScreen> {
+                ProfileScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToAuth = {
+                        navController.navigate(Graphs.AuthGraph) {
+                            popUpTo(Graphs.HomeGraph) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
             }
         }
     }
