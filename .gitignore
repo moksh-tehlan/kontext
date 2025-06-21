@@ -50,8 +50,6 @@ captures/
 .idea/shelf
 
 # Android Studio 3 in .gitignore file
-.idea/caches
-.idea/modules.xml
 .idea/misc.xml
 .kotlin/
 
