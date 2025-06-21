@@ -28,6 +28,9 @@ sealed interface HomeRoutes : Routes {
     data object HomeScreen : HomeRoutes
 
     @Serializable
+    data class ProjectScreen(val projectId: String) : HomeRoutes
+
+    @Serializable
     data object ProfileScreen : HomeRoutes
 
     @Serializable

@@ -12,3 +12,15 @@ val googleLogo: ImageVector
 val sendIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.send_icon)
+
+val rightArrowIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.right_arrow_icon)
+
+val projectIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.project_icon)
+
+val backArrowIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.back_arrow)

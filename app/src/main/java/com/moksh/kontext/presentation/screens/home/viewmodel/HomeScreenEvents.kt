@@ -6,4 +6,5 @@ sealed interface HomeScreenEvents {
     data object ProjectCreatedSuccessfully : HomeScreenEvents
     data object ProjectDeletedSuccessfully : HomeScreenEvents
     data object CloseCreateProjectBottomSheet : HomeScreenEvents
+    data class NavigateToProject(val projectId: String) : HomeScreenEvents
 }

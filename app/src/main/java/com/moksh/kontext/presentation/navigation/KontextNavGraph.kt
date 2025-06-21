@@ -6,6 +6,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -15,11 +17,12 @@ import androidx.navigation.compose.navigation
 import com.moksh.kontext.presentation.screens.auth.AuthScreen
 import com.moksh.kontext.presentation.screens.home.HomeScreen
 import com.moksh.kontext.presentation.screens.otp.OtpScreen
+import com.moksh.kontext.presentation.screens.project.ProjectScreen
 
 @Composable
 fun KontextNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
     startDestination: Routes = Graphs.HomeGraph
 ) {
     NavHost(
@@ -95,17 +98,16 @@ fun KontextNavGraph(
         ) {
             composable<HomeRoutes.HomeScreen> {
                 HomeScreen(
-
+                    navigateToProject = { projectId ->
+                        navController.navigate(HomeRoutes.ProjectScreen(projectId = projectId)) {
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 )
             }
-
-            composable<AuthRoutes.OtpScreen> {
-                OtpScreen(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    },
-                    onNavigateToHome = {}
-                )
+            composable<HomeRoutes.ProjectScreen> {
+                ProjectScreen()
             }
         }
     }

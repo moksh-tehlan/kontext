@@ -90,6 +90,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                     )
                 }
             }
+
+            is HomeScreenActions.OnProjectClick -> {
+                viewModelScope.launch { _homeEvents.emit(HomeScreenEvents.NavigateToProject(action.projectId)) }
+            }
         }
     }
 
