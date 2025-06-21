@@ -3,8 +3,10 @@ package com.moksh.kontext.presentation.screens.home
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -12,24 +14,28 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.moksh.kontext.presentation.common.profileIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
 import com.moksh.kontext.presentation.screens.home.components.CreateProjectBottomSheet
-import com.moksh.kontext.presentation.screens.home.components.HomeHeader
 import com.moksh.kontext.presentation.screens.home.components.ProjectItem
 import com.moksh.kontext.presentation.screens.home.viewmodel.CreateProjectBottomSheetState
 import com.moksh.kontext.presentation.screens.home.viewmodel.HomeScreenActions
@@ -44,6 +50,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     navigateToProject: (String) -> Unit,
+    navigateToSettings: () -> Unit = {},
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -83,6 +90,7 @@ fun HomeScreen(
         snackbarHostState = snackbarHostState,
         bottomSheetState = bottomSheetState,
         scope = scope,
+        navigateToSettings = navigateToSettings,
         action = viewModel::onAction
     )
 }
@@ -96,11 +104,40 @@ fun HomeScreenView(
     snackbarHostState: SnackbarHostState,
     bottomSheetState: SheetState,
     scope: CoroutineScope,
+    navigateToSettings: () -> Unit = {},
     action: (HomeScreenActions) -> Unit,
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            TopAppBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                title = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Projects",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                actions = {
+                    IconButton(
+                        onClick = { navigateToSettings() }
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(28.dp),
+                            imageVector = profileIcon,
+                            contentDescription = "Settings",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -121,8 +158,6 @@ fun HomeScreenView(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
-            HomeHeader()
             Spacer(modifier = Modifier.height(10.dp))
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
@@ -172,6 +207,7 @@ fun HomeScreenPreview() {
             snackbarHostState = remember { SnackbarHostState() },
             bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             scope = rememberCoroutineScope(),
+            navigateToSettings = {},
             action = {}
         )
     }
@@ -188,6 +224,7 @@ fun HomeScreenDarkPreview() {
             snackbarHostState = remember { SnackbarHostState() },
             bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             scope = rememberCoroutineScope(),
+            navigateToSettings = {},
             action = {}
         )
     }

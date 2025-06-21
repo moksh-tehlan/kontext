@@ -11,13 +11,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.moksh.kontext.presentation.common.backArrowIcon
 import com.moksh.kontext.presentation.common.billingIcon
 import com.moksh.kontext.presentation.common.hapticFeedback
@@ -25,19 +32,66 @@ import com.moksh.kontext.presentation.common.infoIcon
 import com.moksh.kontext.presentation.common.logoutIcon
 import com.moksh.kontext.presentation.common.projectIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
+import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
 import com.moksh.kontext.presentation.screens.settings.components.AccountTier
 import com.moksh.kontext.presentation.screens.settings.components.SettingsItem
 import com.moksh.kontext.presentation.screens.settings.components.UpgradeCard
+import com.moksh.kontext.presentation.screens.settings.viewmodel.SettingsActions
+import com.moksh.kontext.presentation.screens.settings.viewmodel.SettingsEvents
+import com.moksh.kontext.presentation.screens.settings.viewmodel.SettingsState
+import com.moksh.kontext.presentation.screens.settings.viewmodel.SettingsViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsScreen() {
-    SettingsScreenView()
+fun SettingsScreen(
+    onNavigateBack: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToBilling: () -> Unit = {},
+    onNavigateToUpgrade: () -> Unit = {},
+    onNavigateToAuth: () -> Unit = {},
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
+    val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    ObserveAsEvents(flow = viewModel.events) { event ->
+        when (event) {
+            is SettingsEvents.NavigateBack -> onNavigateBack()
+            is SettingsEvents.NavigateToProfile -> onNavigateToProfile()
+            is SettingsEvents.NavigateToBilling -> onNavigateToBilling()
+            is SettingsEvents.NavigateToUpgrade -> onNavigateToUpgrade()
+            is SettingsEvents.NavigateToAuth -> onNavigateToAuth()
+            is SettingsEvents.ShowError -> {
+                scope.launch { snackbarHostState.showSnackbar(event.message) }
+            }
+
+            is SettingsEvents.ShowSuccess -> {
+                scope.launch { snackbarHostState.showSnackbar(event.message) }
+            }
+
+            is SettingsEvents.ShowInfo -> {
+                scope.launch { snackbarHostState.showSnackbar(event.message) }
+            }
+        }
+    }
+
+    SettingsScreenContent(
+        state = state,
+        onAction = viewModel::onAction,
+        snackbarHostState = snackbarHostState
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SettingsScreenView() {
+fun SettingsScreenContent(
+    state: SettingsState,
+    onAction: (SettingsActions) -> Unit,
+    snackbarHostState: SnackbarHostState
+) {
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 modifier = Modifier
@@ -53,7 +107,7 @@ private fun SettingsScreenView() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { onAction(SettingsActions.NavigateBack) }) {
                         Icon(
                             modifier = Modifier.size(28.dp),
                             imageVector = backArrowIcon,
@@ -64,7 +118,7 @@ private fun SettingsScreenView() {
                 },
                 actions = {
                     IconButton(
-                        onClick = {}
+                        onClick = { onAction(SettingsActions.ShowInfo) }
                     ) {
                         Icon(
                             modifier = Modifier.size(28.dp),
@@ -85,11 +139,11 @@ private fun SettingsScreenView() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             AccountTier(
-                email = "someone@gmail.com",
-                tier = "Free",
+                email = state.userEmail,
+                tier = state.userTier,
             )
             UpgradeCard(
-                onUpgradeClick = {}
+                onUpgradeClick = { onAction(SettingsActions.NavigateToUpgrade) }
             )
             SettingsItem(
                 title = "Profile",
@@ -100,7 +154,7 @@ private fun SettingsScreenView() {
                         contentDescription = "profile icon"
                     )
                 },
-                onClick = { }
+                onClick = { onAction(SettingsActions.NavigateToProfile) }
             )
             SettingsItem(
                 title = "Billing",
@@ -108,36 +162,36 @@ private fun SettingsScreenView() {
                     Icon(
                         modifier = Modifier.size(24.dp),
                         imageVector = billingIcon,
-                        contentDescription = "profile icon"
+                        contentDescription = "billing icon"
                     )
                 },
-                onClick = { }
+                onClick = { onAction(SettingsActions.NavigateToBilling) }
             )
             HorizontalDivider()
             SettingsItem(
-                title = "Haptic feedback",
+                title = if (state.isHapticFeedbackEnabled) "Haptic feedback (On)" else "Haptic feedback (Off)",
                 icon = {
                     Icon(
                         modifier = Modifier.size(24.dp),
                         imageVector = hapticFeedback,
-                        contentDescription = "profile icon"
+                        contentDescription = "haptic feedback icon"
                     )
                 },
-                onClick = { }
+                onClick = { onAction(SettingsActions.ToggleHapticFeedback) }
             )
             HorizontalDivider()
             SettingsItem(
-                title = "Logout",
+                title = if (state.isLoggingOut) "Logging out..." else "Logout",
                 textColor = MaterialTheme.colorScheme.error,
                 icon = {
                     Icon(
                         modifier = Modifier.size(24.dp),
                         tint = MaterialTheme.colorScheme.error,
                         imageVector = logoutIcon,
-                        contentDescription = "profile icon"
+                        contentDescription = "logout icon"
                     )
                 },
-                onClick = { }
+                onClick = { onAction(SettingsActions.Logout) }
             )
         }
     }
@@ -146,5 +200,32 @@ private fun SettingsScreenView() {
 @Composable
 @Preview
 private fun SettingsScreenPreview() {
-    KontextTheme { SettingsScreenView() }
+    KontextTheme {
+        SettingsScreenContent(
+            state = SettingsState(
+                userEmail = "someone@gmail.com",
+                userTier = "Free",
+                isHapticFeedbackEnabled = true
+            ),
+            onAction = { },
+            snackbarHostState = remember { SnackbarHostState() }
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun SettingsScreenLoadingPreview() {
+    KontextTheme {
+        SettingsScreenContent(
+            state = SettingsState(
+                userEmail = "someone@gmail.com",
+                userTier = "Premium",
+                isHapticFeedbackEnabled = false,
+                isLoggingOut = true
+            ),
+            onAction = { },
+            snackbarHostState = remember { SnackbarHostState() }
+        )
+    }
 }

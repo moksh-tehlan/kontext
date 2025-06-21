@@ -96,7 +96,7 @@ fun KontextNavGraph(
         }
 
         navigation<Graphs.HomeGraph>(
-            startDestination = HomeRoutes.SettingsScreen
+            startDestination = HomeRoutes.HomeScreen
         ) {
             composable<HomeRoutes.HomeScreen> {
                 HomeScreen(
@@ -105,11 +105,19 @@ fun KontextNavGraph(
                             launchSingleTop = true
                             restoreState = true
                         }
+                    },
+                    navigateToSettings = {
+                        navController.navigate(HomeRoutes.SettingsScreen) {
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 )
             }
             composable<HomeRoutes.ProjectScreen> {
-                ProjectScreen()
+                ProjectScreen(
+
+                )
             }
 
             composable<HomeRoutes.ProfileScreen> {
@@ -128,7 +136,30 @@ fun KontextNavGraph(
             }
 
             composable<HomeRoutes.SettingsScreen> {
-                SettingsScreen()
+                SettingsScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToProfile = {
+                        navController.navigate(HomeRoutes.ProfileScreen) {
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onNavigateToBilling = {
+                        // TODO: Navigate to billing screen when implemented
+                    },
+                    onNavigateToUpgrade = {
+                        // TODO: Navigate to upgrade screen when implemented
+                    },
+                    onNavigateToAuth = {
+                        navController.navigate(Graphs.AuthGraph) {
+                            popUpTo(Graphs.HomeGraph) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
             }
         }
     }
