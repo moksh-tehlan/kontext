@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,13 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
+}
+
+// Load local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -19,6 +28,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // BuildConfig fields from local.properties
+        buildConfigField(
+            "String",
+            "API_BASE_URL",
+            "\"${localProperties.getProperty("API_BASE_URL")}\""
+        )
+        buildConfigField(
+            "long",
+            "API_TIMEOUT_SECONDS",
+            "${localProperties.getProperty("API_TIMEOUT_SECONDS", "30")}L"
+        )
     }
 
     buildTypes {
@@ -39,6 +60,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "2.1.21" // Aligned with Kotlin 2.1.21
@@ -66,6 +88,16 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
+
+    // Retrofit
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+
+    // Shared Preferences
+    implementation(libs.androidx.shared.preferences)
+    implementation(libs.androidx.security.crypto)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
