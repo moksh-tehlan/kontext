@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moksh.kontext.domain.repository.AuthRepository
 import com.moksh.kontext.domain.repository.UserRepository
+import com.moksh.kontext.domain.utils.DataError
 import com.moksh.kontext.domain.utils.Result
 import com.moksh.kontext.presentation.core.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -140,12 +141,17 @@ class SettingsViewModel @Inject constructor(
                 }
 
                 is Result.Error -> {
-                    val errorMessage = result.error.asUiText().asString(context)
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = errorMessage
-                    )
-                    _events.emit(SettingsEvents.ShowError(errorMessage))
+                    if (result.error == DataError.Network.UNAUTHORIZED) {
+                        // Token refresh failed, redirect to auth
+                        _events.emit(SettingsEvents.NavigateToAuth)
+                    } else {
+                        val errorMessage = result.error.asUiText().asString(context)
+                        _state.value = _state.value.copy(
+                            isLoading = false,
+                            errorMessage = errorMessage
+                        )
+                        _events.emit(SettingsEvents.ShowError(errorMessage))
+                    }
                 }
             }
         }
