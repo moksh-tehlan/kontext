@@ -45,6 +45,18 @@
     <!-- Data Error Messages -->
     <string name="server_error">Unexpected server error occurred</string>
     <string name="unknown_error">Unexpected error occurred</string>
+    <string name="error_request_timeout">Request timed out. Please try again.</string>
+    <string name="error_unauthorized">Authentication failed. Please login again.</string>
+    <string name="error_conflict">Data conflict occurred</string>
+    <string name="error_too_many_requests">Too many requests. Please try again later.</string>
+    <string name="error_no_internet">No internet connection</string>
+    <string name="error_payload_too_large">Request data too large</string>
+    <string name="error_serialization">Data processing error</string>
+    <string name="error_empty_response">No data received from server</string>
+    <string name="error_disk_full">Storage space is full</string>
+    <string name="error_duplicate_data">Data already exists</string>
+    <string name="error_database_full">Database is full</string>
+    <string name="error_sql">Database error occurred</string>
     
     <!-- Auth Screen Additional Strings -->
     <string name="app_logo">★ Kontext</string>
@@ -71,4 +83,16 @@
     <string name="otp_verification_failed">Invalid verification code. Please try again.</string>
     <string name="otp_resend_failed">Failed to resend code. Please try again.</string>
     <string name="otp_resent_success">Verification code sent successfully</string>
+
+    <!-- Auth Error Messages -->
+    <string name="error_otp_mismatch">The OTP provided does not match</string>
+    <string name="error_otp_expired">The OTP has expired. Please request a new one</string>
+    <string name="error_otp_not_found">No OTP found for this email. Please request a new OTP</string>
+    <string name="error_account_deactivated">Your account has been deactivated. Please contact support</string>
+    <string name="error_user_creation_failed">Failed to create user account. Please try again</string>
+    <string name="error_invalid_refresh_token">Invalid or expired refresh token. Please login again</string>
+    <string name="error_google_token_invalid">Failed to verify Google ID token. Please try again</string>
+    <string name="error_authentication_failed">Authentication failed</string>
+    <string name="error_authorization_failed">Authorization failed</string>
+    <string name="email_required_error">Email is required</string>
 </resources>

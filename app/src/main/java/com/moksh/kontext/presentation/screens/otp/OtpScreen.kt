@@ -78,12 +78,6 @@ private fun OtpScreenView(
     action: (OtpScreenActions) -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
-    // Handle error display
-    state.otpError?.let { error ->
-        LaunchedEffect(error) {
-            snackbarHostState.showSnackbar(error)
-        }
-    }
     
     // Handle success message display
     state.successMessage?.let { message ->
@@ -145,7 +139,7 @@ private fun OtpScreenView(
                     otp = state.otp,
                     onOtpChange = { action(OtpScreenActions.OnOtpChanged(it)) },
                     isVerifying = state.isVerifying,
-                    error = state.otpError,
+                    error = state.otpError?.asString(),
                     email = state.email,
                 )
             }

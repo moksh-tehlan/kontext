@@ -3,6 +3,10 @@ package com.moksh.kontext.presentation.screens.auth.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moksh.kontext.R
+import com.moksh.kontext.domain.repository.AuthRepository
+import com.moksh.kontext.domain.utils.Result
+import com.moksh.kontext.presentation.core.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,12 +17,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.moksh.kontext.R
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthScreenViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
     private val _authState = MutableStateFlow(AuthScreenState())
     val authState = _authState.asStateFlow()
@@ -71,20 +75,19 @@ class AuthScreenViewModel @Inject constructor(
 
         _authState.value = _authState.value.copy(isEmailLoading = true, emailError = null)
         
-        // Simulate auth process
         viewModelScope.launch {
-            try {
-                // TODO: Implement actual email authentication
-                // For now, just simulate sending OTP to email
-                kotlinx.coroutines.delay(1000)
-                _authEvents.emit(AuthScreenEvents.NavigateToOtp(email))
-            } catch (e: Exception) {
-                _authState.value = _authState.value.copy(
-                    emailError = context.getString(R.string.auth_failed_error)
-                )
-            } finally {
-                _authState.value = _authState.value.copy(isEmailLoading = false)
+            when (val result = authRepository.sendOtp(email)) {
+                is Result.Success -> {
+                    _authEvents.emit(AuthScreenEvents.NavigateToOtp(email))
+                }
+
+                is Result.Error -> {
+                    _authState.value = _authState.value.copy(
+                        emailError = result.error.asUiText().asString(context)
+                    )
+                }
             }
+            _authState.value = _authState.value.copy(isEmailLoading = false)
         }
     }
 

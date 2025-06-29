@@ -26,7 +26,7 @@ inline fun <T> safeCall(
     }
 }
 
-fun <T> responseToResult(response: Response<ApiResponse<T>>): Result<ApiResponse<T>, DataError.Network> {
+fun <T> responseToResult(response: Response<ApiResponse<T>>): Result<ApiResponse<T>, DataError> {
     Log.d("SafeCall", "Response: ${response.code()} - ${response.message()}")
 
     if (response.isSuccessful) {
@@ -60,9 +60,30 @@ fun <T> responseToResult(response: Response<ApiResponse<T>>): Result<ApiResponse
     return mapApiErrorToDataError(statusCode)
 }
 
-private fun mapApiErrorToDataError(statusCode: Int): Result.Error<DataError.Network> {
+private fun mapApiErrorToDataError(statusCode: Int): Result.Error<DataError> {
     return Result.Error(
         when (statusCode) {
+            // OTP Related Errors (4101-4199)
+            4101 -> DataError.Auth.OTP_MISMATCH
+            4102 -> DataError.Auth.OTP_EXPIRED
+            4103 -> DataError.Auth.OTP_NOT_FOUND
+
+            // Account Related Errors (4200-4299)
+            4201 -> DataError.Auth.ACCOUNT_DEACTIVATED
+            4202 -> DataError.Auth.USER_CREATION_FAILED
+            
+            // Token Related Errors (4300-4399)
+            4301 -> DataError.Auth.INVALID_REFRESH_TOKEN
+            4302 -> DataError.Auth.GOOGLE_TOKEN_INVALID
+
+            // General Auth Errors (4000-4099)
+            4001 -> DataError.Auth.AUTHENTICATION_FAILED
+            4002 -> DataError.Auth.AUTHORIZATION_FAILED
+
+            // Fallback for auth error range
+            in 4000..4399 -> DataError.Auth.AUTHENTICATION_FAILED
+
+            // Standard HTTP error codes
             401 -> DataError.Network.UNAUTHORIZED
             408 -> DataError.Network.REQUEST_TIMEOUT
             409 -> DataError.Network.CONFLICT

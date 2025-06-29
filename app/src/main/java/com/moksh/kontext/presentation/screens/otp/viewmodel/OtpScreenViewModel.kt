@@ -4,8 +4,14 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moksh.kontext.R
+import com.moksh.kontext.domain.repository.AuthRepository
+import com.moksh.kontext.domain.utils.Result
+import com.moksh.kontext.presentation.core.utils.UiText
+import com.moksh.kontext.presentation.core.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,15 +20,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
-import com.moksh.kontext.R
-import com.moksh.kontext.presentation.navigation.AuthRoutes
 import javax.inject.Inject
 
 @HiltViewModel
 class OtpScreenViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
     
     private val _otpState = MutableStateFlow(OtpScreenState())
@@ -86,31 +90,39 @@ class OtpScreenViewModel @Inject constructor(
 
     private fun handleOtpVerification() {
         val otp = _otpState.value.otp
+        val email = _otpState.value.email
         
         // Basic OTP validation
         if (otp.length != 6) {
             _otpState.value = _otpState.value.copy(
-                otpError = context.getString(R.string.otp_validation_error)
+                otpError = UiText.StringResource(R.string.email_required_error)
+            )
+            return
+        }
+
+        if (email.isEmpty()) {
+            _otpState.value = _otpState.value.copy(
+                otpError = UiText.StringResource(R.string.email_required_error)
             )
             return
         }
 
         _otpState.value = _otpState.value.copy(isVerifying = true, otpError = null)
         
-        // Simulate OTP verification process
         viewModelScope.launch {
-            try {
-                // TODO: Implement actual OTP verification
-                // For now, just simulate success with any 6-digit code
-                delay(1500)
-                _otpEvents.emit(OtpScreenEvents.NavigateToHome)
-            } catch (e: Exception) {
-                _otpState.value = _otpState.value.copy(
-                    otpError = context.getString(R.string.otp_verification_failed)
-                )
-            } finally {
-                _otpState.value = _otpState.value.copy(isVerifying = false)
+            when (val result = authRepository.login(email, otp)) {
+                is Result.Success -> {
+                    // Login successful, navigate to home
+                    _otpEvents.emit(OtpScreenEvents.NavigateToHome)
+                }
+
+                is Result.Error -> {
+                    _otpState.value = _otpState.value.copy(
+                        otpError = result.error.asUiText()
+                    )
+                }
             }
+            _otpState.value = _otpState.value.copy(isVerifying = false)
         }
     }
 
@@ -119,34 +131,41 @@ class OtpScreenViewModel @Inject constructor(
             return
         }
 
+        val email = _otpState.value.email
+        if (email.isEmpty()) {
+            _otpState.value = _otpState.value.copy(
+                otpError = UiText.StringResource(R.string.email_required_error)
+            )
+            return
+        }
+
         _otpState.value = _otpState.value.copy(
             isResending = true,
             otpError = null
         )
         
-        // Simulate resend OTP process
         viewModelScope.launch {
-            try {
-                // TODO: Implement actual OTP resend
-                delay(1000)
-                _otpState.value = _otpState.value.copy(
-                    successMessage = context.getString(R.string.otp_resent_success)
-                )
-                
-                // Reset cooldown
-                _otpState.value = _otpState.value.copy(
-                    showResendButton = false,
-                    resendCooldown = 60
-                )
-                startResendCooldown()
-                
-            } catch (e: Exception) {
-                _otpState.value = _otpState.value.copy(
-                    otpError = context.getString(R.string.otp_resend_failed)
-                )
-            } finally {
-                _otpState.value = _otpState.value.copy(isResending = false)
+            when (val result = authRepository.sendOtp(email)) {
+                is Result.Success -> {
+                    _otpState.value = _otpState.value.copy(
+                        successMessage = context.getString(R.string.otp_resent_success)
+                    )
+
+                    // Reset cooldown
+                    _otpState.value = _otpState.value.copy(
+                        showResendButton = false,
+                        resendCooldown = 60
+                    )
+                    startResendCooldown()
+                }
+
+                is Result.Error -> {
+                    _otpState.value = _otpState.value.copy(
+                        otpError = result.error.asUiText()
+                    )
+                }
             }
+            _otpState.value = _otpState.value.copy(isResending = false)
         }
     }
 

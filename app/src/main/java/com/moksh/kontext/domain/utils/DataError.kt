@@ -21,4 +21,16 @@ sealed interface DataError : Error {
         DATABASE_FULL,
         SQL_ERROR
     }
+
+    enum class Auth : DataError {
+        OTP_MISMATCH,
+        OTP_EXPIRED,
+        OTP_NOT_FOUND,
+        ACCOUNT_DEACTIVATED,
+        USER_CREATION_FAILED,
+        INVALID_REFRESH_TOKEN,
+        GOOGLE_TOKEN_INVALID,
+        AUTHENTICATION_FAILED,
+        AUTHORIZATION_FAILED
+    }
 }
