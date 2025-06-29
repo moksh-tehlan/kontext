@@ -23,6 +23,8 @@ data class User(
     val firstName: String,
     @SerializedName("lastName")
     val lastName: String,
+    @SerializedName("nickname")
+    val nickname: String,
     @SerializedName("authProvider")
     val authProvider: String,
     @SerializedName("isEmailVerified")

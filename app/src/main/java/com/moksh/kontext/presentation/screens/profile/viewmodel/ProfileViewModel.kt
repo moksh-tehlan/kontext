@@ -1,8 +1,14 @@
 package com.moksh.kontext.presentation.screens.profile.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moksh.kontext.domain.model.UpdateUserDto
+import com.moksh.kontext.domain.repository.UserRepository
+import com.moksh.kontext.domain.utils.Result
+import com.moksh.kontext.presentation.core.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -12,7 +18,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor() : ViewModel() {
+class ProfileViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
     val state = combine(
@@ -84,20 +93,28 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
     private fun loadUserProfile() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            try {
-                // TODO: Load user profile from repository
-                // For now, setting default values
-                _state.value = _state.value.copy(
-                    fullName = "Moksh Tehlan",
-                    nickname = "Moksh",
-                    isLoading = false
-                )
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    errorMessage = "Failed to load profile: ${e.message}"
-                )
-                _events.emit(ProfileEvents.ShowError("Failed to load profile"))
+            when (val result = userRepository.getCurrentUser()) {
+                is Result.Success -> {
+                    val user = result.data
+                    _state.value = _state.value.copy(
+                        userId = user.id,
+                        fullName = user.fullName,
+                        nickname = user.nickname,
+                        email = user.email,
+                        firstName = user.firstName,
+                        lastName = user.lastName,
+                        isLoading = false
+                    )
+                }
+
+                is Result.Error -> {
+                    val errorMessage = result.error.asUiText().asString(context)
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        errorMessage = errorMessage
+                    )
+                    _events.emit(ProfileEvents.ShowError(errorMessage))
+                }
             }
         }
     }
@@ -105,19 +122,39 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
     private fun updateProfile() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isUpdating = true, errorMessage = null)
-            try {
-                // TODO: Update user profile via repository
-                // Simulate API call
-                kotlinx.coroutines.delay(1000)
 
-                _state.value = _state.value.copy(isUpdating = false)
-                _events.emit(ProfileEvents.ShowSuccess("Profile updated successfully"))
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    isUpdating = false,
-                    errorMessage = "Failed to update profile: ${e.message}"
-                )
-                _events.emit(ProfileEvents.ShowError("Failed to update profile"))
+            val currentState = _state.value
+            val nameParts = currentState.fullName.trim().split(" ", limit = 2)
+            val firstName = nameParts.firstOrNull()?.trim() ?: ""
+            val lastName = if (nameParts.size > 1) nameParts[1].trim() else ""
+
+            val updateUserDto = UpdateUserDto(
+                nickname = currentState.nickname.trim().takeIf { it.isNotBlank() },
+                firstName = firstName.takeIf { it.isNotBlank() },
+                lastName = lastName.takeIf { it.isNotBlank() }
+            )
+
+            when (val result = userRepository.updateUser(currentState.userId, updateUserDto)) {
+                is Result.Success -> {
+                    val updatedUser = result.data
+                    _state.value = _state.value.copy(
+                        fullName = updatedUser.fullName,
+                        nickname = updatedUser.nickname,
+                        firstName = updatedUser.firstName,
+                        lastName = updatedUser.lastName,
+                        isUpdating = false
+                    )
+                    _events.emit(ProfileEvents.ShowSuccess("Profile updated successfully"))
+                }
+
+                is Result.Error -> {
+                    val errorMessage = result.error.asUiText().asString(context)
+                    _state.value = _state.value.copy(
+                        isUpdating = false,
+                        errorMessage = errorMessage
+                    )
+                    _events.emit(ProfileEvents.ShowError(errorMessage))
+                }
             }
         }
     }
@@ -129,19 +166,21 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
                 errorMessage = null,
                 showDeleteAccountDialog = false
             )
-            try {
-                // TODO: Delete user account via repository
-                // Remove all user data, sessions, etc.
-                kotlinx.coroutines.delay(1500) // Simulate API call
 
-                _state.value = _state.value.copy(isDeleting = false)
-                _events.emit(ProfileEvents.NavigateToAuth)
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    isDeleting = false,
-                    errorMessage = "Failed to delete account: ${e.message}"
-                )
-                _events.emit(ProfileEvents.ShowError("Failed to delete account"))
+            when (val result = userRepository.deleteCurrentUser()) {
+                is Result.Success -> {
+                    _state.value = _state.value.copy(isDeleting = false)
+                    _events.emit(ProfileEvents.NavigateToAuth)
+                }
+
+                is Result.Error -> {
+                    val errorMessage = result.error.asUiText().asString(context)
+                    _state.value = _state.value.copy(
+                        isDeleting = false,
+                        errorMessage = errorMessage
+                    )
+                    _events.emit(ProfileEvents.ShowError(errorMessage))
+                }
             }
         }
     }

@@ -33,11 +33,4 @@ class RootViewModel @Inject constructor(
             }
         }
     }
-
-    fun onLogout() {
-        viewModelScope.launch {
-            authRepository.clearSession()
-            _startDestination.value = Graphs.AuthGraph
-        }
-    }
 }

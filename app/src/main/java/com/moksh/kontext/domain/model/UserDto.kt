@@ -5,6 +5,7 @@ data class UserDto(
     val email: String,
     val firstName: String,
     val lastName: String,
+    val nickname: String,
     val authProvider: String,
     val isEmailVerified: Boolean,
     val role: String,
@@ -12,7 +13,4 @@ data class UserDto(
 ) {
     val fullName: String
         get() = "$firstName $lastName".trim()
-
-    val displayName: String
-        get() = if (fullName.isNotBlank()) fullName else email
 }

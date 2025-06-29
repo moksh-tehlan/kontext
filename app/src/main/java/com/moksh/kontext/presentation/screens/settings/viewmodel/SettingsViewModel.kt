@@ -1,8 +1,14 @@
 package com.moksh.kontext.presentation.screens.settings.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moksh.kontext.domain.repository.AuthRepository
+import com.moksh.kontext.domain.repository.UserRepository
+import com.moksh.kontext.domain.utils.Result
+import com.moksh.kontext.presentation.core.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -12,7 +18,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor() : ViewModel() {
+class SettingsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState())
     val state = _state.asStateFlow().stateIn(
@@ -117,21 +127,26 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
     private fun loadUserSettings() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            try {
-                // TODO: Load user settings from repository
-                // For now, setting default values
-                _state.value = _state.value.copy(
-                    userEmail = "someone@gmail.com",
-                    userTier = "Free",
-                    isHapticFeedbackEnabled = true,
-                    isLoading = false
-                )
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    errorMessage = "Failed to load settings: ${e.message}"
-                )
-                _events.emit(SettingsEvents.ShowError("Failed to load settings"))
+
+            when (val result = userRepository.getCurrentUser()) {
+                is Result.Success -> {
+                    val user = result.data
+                    _state.value = _state.value.copy(
+                        userEmail = user.email,
+                        userTier = "Free", // TODO: Get actual tier from user data
+                        isHapticFeedbackEnabled = true, // TODO: Load from preferences
+                        isLoading = false
+                    )
+                }
+
+                is Result.Error -> {
+                    val errorMessage = result.error.asUiText().asString(context)
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        errorMessage = errorMessage
+                    )
+                    _events.emit(SettingsEvents.ShowError(errorMessage))
+                }
             }
         }
     }
@@ -165,19 +180,21 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
                 errorMessage = null,
                 showLogoutDialog = false
             )
-            try {
-                // TODO: Logout user via repository
-                // Clear user session, tokens, etc.
-                kotlinx.coroutines.delay(1000) // Simulate API call
 
-                _state.value = _state.value.copy(isLoggingOut = false)
-                _events.emit(SettingsEvents.NavigateToAuth)
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    isLoggingOut = false,
-                    errorMessage = "Failed to logout: ${e.message}"
-                )
-                _events.emit(SettingsEvents.ShowError("Failed to logout"))
+            when (val result = authRepository.logout()) {
+                is Result.Success -> {
+                    _state.value = _state.value.copy(isLoggingOut = false)
+                    _events.emit(SettingsEvents.NavigateToAuth)
+                }
+
+                is Result.Error -> {
+                    val errorMessage = result.error.asUiText().asString(context)
+                    _state.value = _state.value.copy(
+                        isLoggingOut = false,
+                        errorMessage = errorMessage
+                    )
+                    _events.emit(SettingsEvents.ShowError(errorMessage))
+                }
             }
         }
     }

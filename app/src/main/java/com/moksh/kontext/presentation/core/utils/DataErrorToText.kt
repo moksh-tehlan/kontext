@@ -32,5 +32,17 @@ fun DataError.asUiText(): UiText {
         DataError.Auth.GOOGLE_TOKEN_INVALID -> UiText.StringResource(R.string.error_google_token_invalid)
         DataError.Auth.AUTHENTICATION_FAILED -> UiText.StringResource(R.string.error_authentication_failed)
         DataError.Auth.AUTHORIZATION_FAILED -> UiText.StringResource(R.string.error_authorization_failed)
+        DataError.Auth.JWT_TOKEN_EXPIRED -> UiText.StringResource(R.string.error_jwt_token_expired)
+        DataError.Auth.JWT_TOKEN_MALFORMED -> UiText.StringResource(R.string.error_jwt_token_malformed)
+        DataError.Auth.JWT_TOKEN_MISSING -> UiText.StringResource(R.string.error_jwt_token_missing)
+        DataError.Auth.JWT_SIGNATURE_INVALID -> UiText.StringResource(R.string.error_jwt_signature_invalid)
+        DataError.Auth.ACCESS_TOKEN_INVALID -> UiText.StringResource(R.string.error_access_token_invalid)
+        DataError.Auth.TOKEN_BLACKLISTED -> UiText.StringResource(R.string.error_token_blacklisted)
+
+        DataError.User.DUPLICATE_EMAIL -> UiText.StringResource(R.string.error_duplicate_email)
+        DataError.User.PROFILE_NOT_FOUND -> UiText.StringResource(R.string.error_profile_not_found)
+        DataError.User.PROFILE_UPDATE_FAILED -> UiText.StringResource(R.string.error_profile_update_failed)
+        DataError.User.INVALID_PROFILE_DATA -> UiText.StringResource(R.string.error_invalid_profile_data)
+        DataError.User.INSUFFICIENT_PERMISSIONS -> UiText.StringResource(R.string.error_insufficient_permissions)
     }
 }

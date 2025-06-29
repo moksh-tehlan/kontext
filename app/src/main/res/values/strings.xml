@@ -95,4 +95,17 @@
     <string name="error_authentication_failed">Authentication failed</string>
     <string name="error_authorization_failed">Authorization failed</string>
     <string name="email_required_error">Email is required</string>
+    <string name="error_jwt_token_expired">JWT token has expired. Please login again</string>
+    <string name="error_jwt_token_malformed">JWT token is malformed or invalid</string>
+    <string name="error_jwt_token_missing">JWT token is missing from request</string>
+    <string name="error_jwt_signature_invalid">JWT token signature is invalid</string>
+    <string name="error_access_token_invalid">Invalid access token provided</string>
+    <string name="error_token_blacklisted">Token has been blacklisted. Please login again</string>
+
+    <!-- User Error Messages -->
+    <string name="error_duplicate_email">This email address is already in use</string>
+    <string name="error_profile_not_found">User profile not found</string>
+    <string name="error_profile_update_failed">Failed to update user profile</string>
+    <string name="error_invalid_profile_data">Invalid profile data provided</string>
+    <string name="error_insufficient_permissions">Insufficient permissions to perform this action</string>
 </resources>
