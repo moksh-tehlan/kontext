@@ -2,15 +2,17 @@ package com.moksh.kontext.data.repository
 
 import com.moksh.kontext.data.api.AuthApiService
 import com.moksh.kontext.data.local.TokenManager
-import com.moksh.kontext.data.model.auth.AuthResponse
+import com.moksh.kontext.data.mapper.toDto
 import com.moksh.kontext.data.model.auth.LoginRequest
 import com.moksh.kontext.data.model.auth.RefreshTokenRequest
 import com.moksh.kontext.data.model.auth.SendOtpRequest
 import com.moksh.kontext.data.utils.safeCall
+import com.moksh.kontext.domain.model.AuthDto
 import com.moksh.kontext.domain.repository.AuthRepository
 import com.moksh.kontext.domain.utils.DataError
 import com.moksh.kontext.domain.utils.EmptyResult
 import com.moksh.kontext.domain.utils.Result
+import com.moksh.kontext.domain.utils.asEmptyDataResult
 import com.moksh.kontext.domain.utils.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,10 +26,10 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun sendOtp(email: String): EmptyResult<DataError> {
         return safeCall {
             authApiService.sendOtp(SendOtpRequest(email))
-        }.map { Unit }
+        }.asEmptyDataResult()
     }
 
-    override suspend fun login(email: String, otp: String): Result<AuthResponse, DataError> {
+    override suspend fun login(email: String, otp: String): Result<AuthDto, DataError> {
         return when (val result = safeCall { authApiService.login(LoginRequest(email, otp)) }) {
             is Result.Success -> {
                 result.data.data?.let { authResponse ->
@@ -35,7 +37,7 @@ class AuthRepositoryImpl @Inject constructor(
                         accessToken = authResponse.accessToken,
                         refreshToken = authResponse.refreshToken
                     )
-                    Result.Success(authResponse)
+                    Result.Success(authResponse.toDto())
                 } ?: Result.Error(DataError.Network.EMPTY_RESPONSE)
             }
 
@@ -43,7 +45,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshToken(): Result<AuthResponse, DataError> {
+    override suspend fun refreshToken(): Result<AuthDto, DataError> {
         val refreshToken = tokenManager.getRefreshToken()
             ?: return Result.Error(DataError.Network.UNAUTHORIZED)
 
@@ -55,7 +57,7 @@ class AuthRepositoryImpl @Inject constructor(
                         accessToken = authResponse.accessToken,
                         refreshToken = authResponse.refreshToken
                     )
-                    Result.Success(authResponse)
+                    Result.Success(authResponse.toDto())
                 } ?: Result.Error(DataError.Network.EMPTY_RESPONSE)
             }
 
