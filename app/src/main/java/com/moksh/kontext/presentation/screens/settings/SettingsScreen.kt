@@ -1,6 +1,7 @@
 package com.moksh.kontext.presentation.screens.settings
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -35,7 +36,9 @@ import com.moksh.kontext.presentation.common.projectIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
 import com.moksh.kontext.presentation.screens.settings.components.AccountTier
+import com.moksh.kontext.presentation.screens.settings.components.InfoDropdownMenu
 import com.moksh.kontext.presentation.screens.settings.components.SettingsItem
+import com.moksh.kontext.presentation.screens.settings.components.ToggleSettingItem
 import com.moksh.kontext.presentation.screens.settings.components.UpgradeCard
 import com.moksh.kontext.presentation.screens.settings.viewmodel.SettingsActions
 import com.moksh.kontext.presentation.screens.settings.viewmodel.SettingsEvents
@@ -118,14 +121,27 @@ fun SettingsScreenContent(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = { onAction(SettingsActions.ShowInfo) }
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(28.dp),
-                            imageVector = infoIcon,
-                            contentDescription = "Navigation back",
-                            tint = MaterialTheme.colorScheme.onSurface
+                    Box {
+                        IconButton(
+                            onClick = { onAction(SettingsActions.ShowInfo) }
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(28.dp),
+                                imageVector = infoIcon,
+                                contentDescription = "Info menu",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        InfoDropdownMenu(
+                            expanded = state.showInfoDropdown,
+                            onDismiss = { onAction(SettingsActions.DismissInfoDropdown) },
+                            onConsumerTermsClick = { onAction(SettingsActions.OnConsumerTermsClick) },
+                            onAcceptableUserPolicyClick = { onAction(SettingsActions.OnAcceptableUserPolicyClick) },
+                            onPrivacyPolicyClick = { onAction(SettingsActions.OnPrivacyPolicyClick) },
+                            onLicensesClick = { onAction(SettingsActions.OnLicensesClick) },
+                            onHelpSupportClick = { onAction(SettingsActions.OnHelpSupportClick) },
+                            appVersion = "1.0"
                         )
                     }
                 }
@@ -169,8 +185,9 @@ fun SettingsScreenContent(
                 onClick = { onAction(SettingsActions.NavigateToBilling) }
             )
             HorizontalDivider()
-            SettingsItem(
-                title = if (state.isHapticFeedbackEnabled) "Haptic feedback (On)" else "Haptic feedback (Off)",
+            ToggleSettingItem(
+                title = "Haptic Feedback",
+                isEnabled = state.isHapticFeedbackEnabled,
                 icon = {
                     Icon(
                         modifier = Modifier.size(24.dp),
@@ -178,7 +195,7 @@ fun SettingsScreenContent(
                         contentDescription = "haptic feedback icon"
                     )
                 },
-                onClick = { onAction(SettingsActions.ToggleHapticFeedback) }
+                onToggle = { onAction(SettingsActions.ToggleHapticFeedback) }
             )
             HorizontalDivider()
             SettingsItem(

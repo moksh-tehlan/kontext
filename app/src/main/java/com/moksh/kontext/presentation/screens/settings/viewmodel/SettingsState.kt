@@ -7,5 +7,6 @@ data class SettingsState(
     val isLoading: Boolean = false,
     val isLoggingOut: Boolean = false,
     val showLogoutDialog: Boolean = false,
+    val showInfoDropdown: Boolean = false,
     val errorMessage: String? = null
 )

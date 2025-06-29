@@ -38,7 +38,7 @@ val OutlineLight = Color(0xFFE0E0E0)
 val OutlineDark = Color(0xFF424242)
 
 // Surface Variant Colors
-val SurfaceVariant = Color(0xFFF5F5F5)
-val OnSurfaceVariant = Color(0xFF757575)
+val SurfaceVariant = Color(0xFF30302E)
+val OnSurfaceVariant = Color(0xFFFAF9F5)
 
 val TextFieldBackground = Color(0xFF30302E)

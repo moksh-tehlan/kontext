@@ -49,3 +49,6 @@ val deleteIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.delete_icon)
 
+val openViewIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.open_view_logo)

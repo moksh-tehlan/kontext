@@ -37,8 +37,40 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
             }
 
             is SettingsActions.ShowInfo -> {
+                _state.value = _state.value.copy(showInfoDropdown = true)
+            }
+
+            is SettingsActions.DismissInfoDropdown -> {
+                _state.value = _state.value.copy(showInfoDropdown = false)
+            }
+
+            is SettingsActions.OnConsumerTermsClick -> {
                 viewModelScope.launch {
-                    _events.emit(SettingsEvents.ShowInfo("App Version: 1.0.0\nBuild: 001"))
+                    _events.emit(SettingsEvents.ShowInfo("Consumer Terms - Open external link"))
+                }
+            }
+
+            is SettingsActions.OnAcceptableUserPolicyClick -> {
+                viewModelScope.launch {
+                    _events.emit(SettingsEvents.ShowInfo("Acceptable User Policy - Open external link"))
+                }
+            }
+
+            is SettingsActions.OnPrivacyPolicyClick -> {
+                viewModelScope.launch {
+                    _events.emit(SettingsEvents.ShowInfo("Privacy Policy - Open external link"))
+                }
+            }
+
+            is SettingsActions.OnLicensesClick -> {
+                viewModelScope.launch {
+                    _events.emit(SettingsEvents.ShowInfo("Licenses - Open external link"))
+                }
+            }
+
+            is SettingsActions.OnHelpSupportClick -> {
+                viewModelScope.launch {
+                    _events.emit(SettingsEvents.ShowInfo("Help & Support - Open external link"))
                 }
             }
 
