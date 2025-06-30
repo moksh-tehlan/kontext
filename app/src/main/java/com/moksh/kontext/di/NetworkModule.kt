@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.moksh.kontext.BuildConfig
 import com.moksh.kontext.data.api.AuthApiService
 import com.moksh.kontext.data.api.ChatApiService
+import com.moksh.kontext.data.api.KnowledgeSourceApiService
 import com.moksh.kontext.data.api.ProjectApiService
 import com.moksh.kontext.data.api.UserApiService
 import com.moksh.kontext.data.network.AuthInterceptor
@@ -106,5 +107,11 @@ object NetworkModule {
     @Singleton
     fun provideChatApiService(retrofit: Retrofit): ChatApiService {
         return retrofit.create(ChatApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideKnowledgeSourceApiService(retrofit: Retrofit): KnowledgeSourceApiService {
+        return retrofit.create(KnowledgeSourceApiService::class.java)
     }
 }

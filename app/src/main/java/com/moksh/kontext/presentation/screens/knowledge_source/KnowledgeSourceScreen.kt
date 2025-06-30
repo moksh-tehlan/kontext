@@ -1,9 +1,8 @@
-package com.moksh.kontext.presentation.screens.project
+package com.moksh.kontext.presentation.screens.knowledge_source
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -39,88 +38,105 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.moksh.kontext.domain.model.KnowledgeSourceDto
+import com.moksh.kontext.domain.model.KnowledgeSourceStatus
+import com.moksh.kontext.domain.model.KnowledgeSourceType
 import com.moksh.kontext.presentation.common.backArrowIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
-import com.moksh.kontext.presentation.core.utils.DateUtils
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
-import com.moksh.kontext.presentation.screens.home.components.ProjectItem
-import com.moksh.kontext.presentation.screens.project.components.CustomInstruction
-import com.moksh.kontext.presentation.screens.project.components.CustomInstructionDialog
-import com.moksh.kontext.presentation.screens.project.components.ProjectKnowledge
-import com.moksh.kontext.presentation.screens.project.viewmodel.ProjectScreenActions
-import com.moksh.kontext.presentation.screens.project.viewmodel.ProjectScreenEvents
-import com.moksh.kontext.presentation.screens.project.viewmodel.ProjectViewModel
+import com.moksh.kontext.presentation.screens.knowledge_source.components.AddContentBottomSheet
+import com.moksh.kontext.presentation.screens.knowledge_source.components.KnowledgeSourceItem
+import com.moksh.kontext.presentation.screens.knowledge_source.components.WebUrlDialog
+import com.moksh.kontext.presentation.screens.knowledge_source.viewmodel.AddContentBottomSheetState
+import com.moksh.kontext.presentation.screens.knowledge_source.viewmodel.KnowledgeSourceScreenActions
+import com.moksh.kontext.presentation.screens.knowledge_source.viewmodel.KnowledgeSourceScreenEvents
+import com.moksh.kontext.presentation.screens.knowledge_source.viewmodel.KnowledgeSourceScreenState
+import com.moksh.kontext.presentation.screens.knowledge_source.viewmodel.KnowledgeSourceViewModel
+import com.moksh.kontext.presentation.screens.knowledge_source.viewmodel.WebUrlDialogState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectScreen(
+fun KnowledgeSourceScreen(
     onNavigateBack: () -> Unit = {},
-    onNavigateToChat: (String, String) -> Unit = { _, _ -> },
-    onNavigateToKnowledgeSource: (String) -> Unit = { _ -> },
-    viewModel: ProjectViewModel = hiltViewModel()
+    viewModel: KnowledgeSourceViewModel = hiltViewModel()
 ) {
-    val projectState by viewModel.projectState.collectAsState()
-    val customInstructionDialogState by viewModel.customInstructionDialogState.collectAsState()
+    val knowledgeSourceState by viewModel.knowledgeSourceState.collectAsState()
+    val addContentBottomSheetState by viewModel.addContentBottomSheetState.collectAsState()
+    val webUrlDialogState by viewModel.webUrlDialogState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
 
-    ObserveAsEvents(flow = viewModel.projectEvents) { event ->
+    ObserveAsEvents(flow = viewModel.knowledgeSourceEvents) { event ->
         when (event) {
-            is ProjectScreenEvents.ShowError -> {
+            is KnowledgeSourceScreenEvents.ShowError -> {
                 scope.launch { snackbarHostState.showSnackbar(event.message) }
             }
 
-            is ProjectScreenEvents.NavigateToChat -> {
-                onNavigateToChat(event.projectId, event.chatId)
-            }
-
-            is ProjectScreenEvents.ChatsLoadedSuccessfully -> {
+            is KnowledgeSourceScreenEvents.KnowledgeSourcesLoadedSuccessfully -> {
                 // Handle successful load if needed
             }
 
-            is ProjectScreenEvents.CustomInstructionSavedSuccessfully -> {
+            is KnowledgeSourceScreenEvents.KnowledgeSourceAddedSuccessfully -> {
                 scope.launch {
-                    snackbarHostState.showSnackbar("Custom instruction saved successfully!")
+                    snackbarHostState.showSnackbar("Knowledge source added successfully!")
                 }
             }
 
-            is ProjectScreenEvents.CloseCustomInstructionDialog -> {
+            is KnowledgeSourceScreenEvents.KnowledgeSourceDeletedSuccessfully -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Knowledge source deleted successfully!")
+                }
+            }
+
+            is KnowledgeSourceScreenEvents.CloseAddContentBottomSheet -> {
                 scope.launch {
                     bottomSheetState.hide()
+                }
+            }
+
+            is KnowledgeSourceScreenEvents.CloseWebUrlDialog -> {
+                viewModel.onAction(KnowledgeSourceScreenActions.HideWebUrlDialog)
+            }
+
+            is KnowledgeSourceScreenEvents.OpenFilePicker -> {
+                // Handle file picker opening
+                // This would typically be handled by the activity
+                scope.launch {
+                    snackbarHostState.showSnackbar("File picker functionality would be implemented here")
                 }
             }
         }
     }
 
-    ProjectScreenView(
-        projectState = projectState,
-        customInstructionDialogState = customInstructionDialogState,
+    KnowledgeSourceScreenView(
+        knowledgeSourceState = knowledgeSourceState,
+        addContentBottomSheetState = addContentBottomSheetState,
+        webUrlDialogState = webUrlDialogState,
         snackbarHostState = snackbarHostState,
         bottomSheetState = bottomSheetState,
         scope = scope,
         onNavigateBack = onNavigateBack,
-        onNavigateToKnowledgeSource = onNavigateToKnowledgeSource,
         onAction = viewModel::onAction
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectScreenView(
-    projectState: com.moksh.kontext.presentation.screens.project.viewmodel.ProjectScreenState = com.moksh.kontext.presentation.screens.project.viewmodel.ProjectScreenState(),
-    customInstructionDialogState: com.moksh.kontext.presentation.screens.project.viewmodel.CustomInstructionDialogState = com.moksh.kontext.presentation.screens.project.viewmodel.CustomInstructionDialogState(),
+fun KnowledgeSourceScreenView(
+    knowledgeSourceState: KnowledgeSourceScreenState = KnowledgeSourceScreenState(),
+    addContentBottomSheetState: AddContentBottomSheetState = AddContentBottomSheetState(),
+    webUrlDialogState: WebUrlDialogState = WebUrlDialogState(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     bottomSheetState: androidx.compose.material3.SheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     ),
     scope: kotlinx.coroutines.CoroutineScope = rememberCoroutineScope(),
     onNavigateBack: () -> Unit = {},
-    onNavigateToKnowledgeSource: (String) -> Unit = { _ -> },
-    onAction: (ProjectScreenActions) -> Unit = {}
+    onAction: (KnowledgeSourceScreenActions) -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState()
@@ -134,7 +150,7 @@ fun ProjectScreenView(
             LargeTopAppBar(
                 title = {
                     Text(
-                        text = projectState.projectName,
+                        text = knowledgeSourceState.projectName,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -159,15 +175,15 @@ fun ProjectScreenView(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { onAction(ProjectScreenActions.CreateNewChat) },
+                onClick = { onAction(KnowledgeSourceScreenActions.ShowAddContentBottomSheet) },
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "New Chat"
+                        contentDescription = "Add Content"
                     )
                 },
                 text = {
-                    Text("New Chat")
+                    Text("Add Content")
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -186,39 +202,9 @@ fun ProjectScreenView(
                     top = 16.dp,
                     bottom = 16.dp
                 ),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        ProjectKnowledge(
-                            modifier = Modifier.weight(1f),
-                            onClick = {
-                                projectState.projectId?.let { projectId ->
-                                    onNavigateToKnowledgeSource(projectId)
-                                }
-                            }
-                        )
-                        CustomInstruction(
-                            modifier = Modifier.weight(1f),
-                            onClick = { onAction(ProjectScreenActions.ShowCustomInstructionDialog) }
-                        )
-                    }
-                }
-
-                item {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "Recent chats",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-                    )
-                }
-
-                if (projectState.chats.isEmpty() && !projectState.isLoading) {
+                if (knowledgeSourceState.knowledgeSources.isEmpty() && !knowledgeSourceState.isLoading) {
                     item {
                         Box(
                             modifier = Modifier
@@ -227,7 +213,7 @@ fun ProjectScreenView(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "No chats yet. Create your first chat!",
+                                text = "Add relevant documents, text, code, or other files here so Claude can use them as context for all your chats within JAVA DSA Expert.",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                 textAlign = TextAlign.Center
@@ -235,12 +221,15 @@ fun ProjectScreenView(
                         }
                     }
                 } else {
-                    items(projectState.chats) { chat ->
-                        ProjectItem(
-                            projectName = chat.name,
-                            date = DateUtils.formatDateString(chat.updatedAt),
-                            onClick = {
-                                onAction(ProjectScreenActions.NavigateToChat(chat.id))
+                    items(knowledgeSourceState.knowledgeSources) { knowledgeSource ->
+                        KnowledgeSourceItem(
+                            knowledgeSource = knowledgeSource,
+                            onDelete = {
+                                onAction(
+                                    KnowledgeSourceScreenActions.DeleteKnowledgeSource(
+                                        knowledgeSource.id
+                                    )
+                                )
                             }
                         )
                     }
@@ -248,7 +237,7 @@ fun ProjectScreenView(
             }
 
             // Loading indicator
-            if (projectState.isLoading) {
+            if (knowledgeSourceState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -260,7 +249,7 @@ fun ProjectScreenView(
             }
 
             // Error message
-            projectState.errorMessage?.let { error ->
+            knowledgeSourceState.errorMessage?.let { error ->
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -277,21 +266,31 @@ fun ProjectScreenView(
         }
     }
 
-    // Custom Instruction Dialog
-    if (customInstructionDialogState.isVisible) {
-        CustomInstructionDialog(
+    // Add Content Bottom Sheet
+    if (addContentBottomSheetState.isVisible) {
+        AddContentBottomSheet(
             onDismiss = {
                 scope.launch {
                     bottomSheetState.hide().apply {
-                        onAction(ProjectScreenActions.HideCustomInstructionDialog)
+                        onAction(KnowledgeSourceScreenActions.HideAddContentBottomSheet)
                     }
                 }
             },
             sheetState = bottomSheetState,
-            isLoading = customInstructionDialogState.isLoading,
-            instruction = customInstructionDialogState.instruction,
-            onInstructionChange = { onAction(ProjectScreenActions.InstructionChange(it)) },
-            onSaveInstruction = { onAction(ProjectScreenActions.SaveCustomInstruction) }
+            onUploadFromDevice = { onAction(KnowledgeSourceScreenActions.UploadFromDevice) },
+            onAddWebUrl = { onAction(KnowledgeSourceScreenActions.ShowWebUrlDialog) }
+        )
+    }
+
+    // Web URL Dialog
+    if (webUrlDialogState.isVisible) {
+        WebUrlDialog(
+            url = webUrlDialogState.url,
+            isLoading = webUrlDialogState.isLoading,
+            errorMessage = webUrlDialogState.errorMessage,
+            onUrlChange = { onAction(KnowledgeSourceScreenActions.UrlChange(it)) },
+            onDismiss = { onAction(KnowledgeSourceScreenActions.HideWebUrlDialog) },
+            onAdd = { onAction(KnowledgeSourceScreenActions.AddWebUrl) }
         )
     }
 }
@@ -299,6 +298,37 @@ fun ProjectScreenView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-fun ProjectScreenViewPreview() {
-    KontextTheme { ProjectScreenView() }
-}
+fun KnowledgeSourceScreenViewPreview() {
+    KontextTheme {
+        KnowledgeSourceScreenView(
+            knowledgeSourceState = KnowledgeSourceScreenState(
+                knowledgeSources = listOf(
+                    KnowledgeSourceDto(
+                        id = "1",
+                        name = "research_publication_on_...",
+                        type = KnowledgeSourceType.DOCUMENT,
+                        createdAt = "2025-05-30T12:00:00Z",
+                        updatedAt = "2025-05-30T12:00:00Z",
+                        status = KnowledgeSourceStatus.SUCCESS
+                    ),
+                    KnowledgeSourceDto(
+                        id = "2",
+                        name = "priority.md",
+                        type = KnowledgeSourceType.DOCUMENT,
+                        createdAt = "2025-05-30T12:00:00Z",
+                        updatedAt = "2025-05-30T12:00:00Z",
+                        status = KnowledgeSourceStatus.SUCCESS
+                    ),
+                    KnowledgeSourceDto(
+                        id = "3",
+                        name = "kaleshi_hld.md",
+                        type = KnowledgeSourceType.DOCUMENT,
+                        createdAt = "2025-05-30T12:00:00Z",
+                        updatedAt = "2025-05-30T12:00:00Z",
+                        status = KnowledgeSourceStatus.SUCCESS
+                    )
+                )
+            )
+        )
+    }
+} 

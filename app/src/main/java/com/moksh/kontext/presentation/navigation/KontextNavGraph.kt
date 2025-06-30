@@ -17,6 +17,7 @@ import androidx.navigation.compose.navigation
 import com.moksh.kontext.presentation.screens.auth.AuthScreen
 import com.moksh.kontext.presentation.screens.chat.ChatScreen
 import com.moksh.kontext.presentation.screens.home.HomeScreen
+import com.moksh.kontext.presentation.screens.knowledge_source.KnowledgeSourceScreen
 import com.moksh.kontext.presentation.screens.otp.OtpScreen
 import com.moksh.kontext.presentation.screens.profile.ProfileScreen
 import com.moksh.kontext.presentation.screens.project.ProjectScreen
@@ -138,6 +139,22 @@ fun KontextNavGraph(
                             restoreState = true
                         }
                     },
+                    onNavigateToKnowledgeSource = { projectId ->
+                        navController.navigate(
+                            HomeRoutes.KnowledgeSourceScreen(projectId = projectId)
+                        ) {
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
+
+            composable<HomeRoutes.KnowledgeSourceScreen> {
+                KnowledgeSourceScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
 
