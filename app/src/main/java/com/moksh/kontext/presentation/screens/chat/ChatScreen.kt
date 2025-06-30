@@ -1,6 +1,8 @@
 package com.moksh.kontext.presentation.screens.chat
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,6 +34,7 @@ import com.moksh.kontext.presentation.core.theme.KontextTheme
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
 import com.moksh.kontext.presentation.screens.chat.components.ChatInputField
 import com.moksh.kontext.presentation.screens.chat.components.MessageItem
+import com.moksh.kontext.presentation.screens.chat.components.TypingIndicator
 import com.moksh.kontext.presentation.screens.chat.viewmodel.ChatScreenActions
 import com.moksh.kontext.presentation.screens.chat.viewmodel.ChatScreenEvents
 import com.moksh.kontext.presentation.screens.chat.viewmodel.ChatViewModel
@@ -47,7 +50,8 @@ fun ChatScreen(
     ObserveAsEvents(flow = viewModel.chatEvents) { event ->
         when (event) {
             is ChatScreenEvents.ShowError -> {
-//                snackbarHostState.showSnackbar(event.message)
+                // TODO: Show snackbar with error message
+                // snackbarHostState.showSnackbar(event.message)
             }
 
             is ChatScreenEvents.MessageSentSuccessfully -> {
@@ -112,7 +116,8 @@ fun ChatScreenView(
                 onValueChange = { onAction(ChatScreenActions.MessageInputChange(it)) },
                 onSendMessage = {
                     onAction(ChatScreenActions.SendMessage)
-                }
+                },
+                enabled = !chatState.isSendingMessage && chatState.chatId != null
             )
         },
     ) { innerPadding ->
@@ -125,8 +130,17 @@ fun ChatScreenView(
             if (chatState.messages.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     reverseLayout = true
                 ) {
+                    // Show typing indicator when sending message
+                    if (chatState.isSendingMessage) {
+                        item {
+                            TypingIndicator()
+                        }
+                    }
+                    
                     items(chatState.messages.reversed()) { message ->
                         MessageItem(
                             message = message,
@@ -135,17 +149,28 @@ fun ChatScreenView(
                     }
                 }
             } else if (!chatState.isLoading) {
-                // Show empty state when no messages
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "How can I help you today?",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                        textAlign = TextAlign.Center
-                    )
+                // Show empty state when no messages or typing indicator if sending first message
+                if (chatState.isSendingMessage) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        reverseLayout = true
+                    ) {
+                        item {
+                            TypingIndicator()
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "How can I help you today?",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
 

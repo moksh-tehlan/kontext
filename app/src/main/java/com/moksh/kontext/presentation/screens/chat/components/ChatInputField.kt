@@ -26,7 +26,8 @@ fun ChatInputField(
     onValueChange: (String) -> Unit,
     onSendMessage: () -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Type a message..."
+    placeholder: String = "Type a message...",
+    enabled: Boolean = true
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -47,14 +48,25 @@ fun ChatInputField(
                 imeAction = ImeAction.Send
             ),
             keyboardActions = KeyboardActions(
-                onSend = { onSendMessage() }
+                onSend = {
+                    if (enabled && value.isNotBlank()) {
+                        onSendMessage()
+                    }
+                }
             ),
             trailingIcon = {
-                IconButton(onClick = onSendMessage) {
+                IconButton(
+                    onClick = onSendMessage,
+                    enabled = enabled && value.isNotBlank()
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
                         contentDescription = "Send message",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = if (enabled && value.isNotBlank()) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                        }
                     )
                 }
             },

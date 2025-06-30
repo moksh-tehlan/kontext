@@ -1,0 +1,30 @@
+package com.moksh.kontext.data.api
+
+import com.moksh.kontext.data.model.ApiResponse
+import com.moksh.kontext.data.model.chat.Chat
+import com.moksh.kontext.data.model.chat.ChatMessage
+import com.moksh.kontext.data.model.chat.CreateChatRequest
+import com.moksh.kontext.data.model.chat.SendMessageRequest
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
+
+interface ChatApiService {
+
+    @POST("api/v1/chats")
+    suspend fun createChat(@Body request: CreateChatRequest): Response<ApiResponse<Chat>>
+
+    @POST("api/v1/chats/{chatId}/chat")
+    suspend fun sendMessage(
+        @Path("chatId") chatId: String,
+        @Body request: SendMessageRequest
+    ): Response<ApiResponse<String>>
+
+    @GET("api/v1/chats/{chatId}/history")
+    suspend fun getChatHistory(@Path("chatId") chatId: String): Response<ApiResponse<List<ChatMessage>>>
+
+    @GET("api/v1/chats/project/{projectId}")
+    suspend fun getProjectChats(@Path("projectId") projectId: String): Response<ApiResponse<List<Chat>>>
+}

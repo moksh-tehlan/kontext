@@ -21,10 +21,9 @@ fun MessageItem(
     userNickname: String,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         when (message.type) {
             MessageType.USER -> {
@@ -91,6 +90,7 @@ private fun AssistantMessage(
         color = MaterialTheme.colorScheme.onSurface,
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 8.dp)
+            .padding(bottom = 16.dp)
     )
 }
+

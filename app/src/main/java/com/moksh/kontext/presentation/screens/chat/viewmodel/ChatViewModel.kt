@@ -1,11 +1,16 @@
 package com.moksh.kontext.presentation.screens.chat.viewmodel
 
-import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moksh.kontext.domain.model.CreateChatDto
+import com.moksh.kontext.domain.model.MessageType
+import com.moksh.kontext.domain.model.SendMessageDto
+import com.moksh.kontext.domain.repository.ChatRepository
 import com.moksh.kontext.domain.repository.UserRepository
+import com.moksh.kontext.domain.utils.DataError
+import com.moksh.kontext.domain.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,20 +24,34 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val userRepository: UserRepository
+    private val savedStateHandle: SavedStateHandle,
+    private val userRepository: UserRepository,
+    private val chatRepository: ChatRepository
 ) : ViewModel() {
 
-    private val _chatState = MutableStateFlow(ChatScreenState())
+    private val projectId: String = checkNotNull(savedStateHandle["projectId"])
+    private val chatId: String? = savedStateHandle["chatId"]
+
+    private val _chatState = MutableStateFlow(
+        ChatScreenState(
+            projectId = projectId,
+            chatId = chatId
+        )
+    )
     val chatState = _chatState.asStateFlow()
         .onStart {
             // Load user nickname when screen starts
             loadUserNickname()
+            // Initialize chat
+            initializeChat()
         }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000L),
-            ChatScreenState()
+            ChatScreenState(
+                projectId = projectId,
+                chatId = chatId
+            )
         )
 
     private val _chatEvents = MutableSharedFlow<ChatScreenEvents>()
@@ -63,16 +82,12 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun initializeChat(projectId: String, chatId: String? = null) {
-        _chatState.update {
-            it.copy(
-                projectId = projectId,
-                chatId = chatId
-            )
-        }
-
-        if (chatId != null) {
+    private fun initializeChat() {
+        if (chatId != null && chatId != "new_chat") {
             loadMessages()
+        } else {
+            // Create new chat
+            createNewChat()
         }
     }
 
@@ -84,36 +99,74 @@ class ChatViewModel @Inject constructor(
                 return@launch
             }
 
+            if (currentState.chatId == null) {
+                _chatState.update {
+                    it.copy(
+                        errorMessage = "No active chat session"
+                    )
+                }
+                return@launch
+            }
+
+            val userMessage = currentState.currentMessage
+
+            // Create user message and add it to the list immediately
+            val userMessageDto = com.moksh.kontext.domain.model.ChatMessageDto(
+                id = java.util.UUID.randomUUID(),
+                chatId = java.util.UUID.fromString(currentState.chatId),
+                content = userMessage,
+                type = MessageType.USER,
+                createdAt = java.time.LocalDateTime.now(),
+                updatedAt = java.time.LocalDateTime.now(),
+                createdBy = "user",
+                updatedBy = "user",
+                version = 0L,
+                isActive = true
+            )
+
+            // Update state: clear input, add user message, set sending state
             _chatState.update {
                 it.copy(
+                    currentMessage = "",
                     isSendingMessage = true,
-                    errorMessage = null
+                    errorMessage = null,
+                    messages = it.messages + userMessageDto
                 )
             }
 
-            try {
-                // TODO: Implement actual API call to send message
-                // For now, just clear the input and show success
-                _chatState.update {
-                    it.copy(
-                        isSendingMessage = false,
-                        currentMessage = ""
-                    )
+            when (val result = chatRepository.sendMessage(
+                chatId = currentState.chatId,
+                sendMessageDto = SendMessageDto(query = userMessage)
+            )) {
+                is Result.Success -> {
+                    _chatState.update {
+                        it.copy(isSendingMessage = false)
+                    }
+
+                    _chatEvents.emit(ChatScreenEvents.MessageSentSuccessfully)
+
+                    // Reload messages to get the assistant response
+                    loadMessages()
                 }
 
-                _chatEvents.emit(ChatScreenEvents.MessageSentSuccessfully)
+                is Result.Error -> {
+                    val errorMessage = when (result.error) {
+                        DataError.Network.UNAUTHORIZED -> "Session expired. Please login again."
+                        DataError.Network.NO_INTERNET -> "No internet connection"
+                        DataError.Network.SERVER_ERROR -> "Server error occurred"
+                        else -> "Failed to send message"
+                    }
 
-                // TODO: Add the sent message to the messages list
-                // TODO: Handle response from backend
-
-            } catch (e: Exception) {
-                _chatState.update {
-                    it.copy(
-                        isSendingMessage = false,
-                        errorMessage = e.message ?: "Failed to send message"
-                    )
+                    // Remove the user message if send failed
+                    _chatState.update {
+                        it.copy(
+                            isSendingMessage = false,
+                            errorMessage = errorMessage,
+                            messages = it.messages.filter { msg -> msg.id != userMessageDto.id }
+                        )
+                    }
+                    _chatEvents.emit(ChatScreenEvents.ShowError(errorMessage))
                 }
-                _chatEvents.emit(ChatScreenEvents.ShowError("Failed to send message"))
             }
         }
     }
@@ -133,26 +186,78 @@ class ChatViewModel @Inject constructor(
                 )
             }
 
-            try {
-                // TODO: Implement actual API call to load messages
-                // For now, just set loading to false
-                _chatState.update {
-                    it.copy(
-                        isLoading = false,
-                        messages = emptyList() // TODO: Replace with actual messages from API
-                    )
+            when (val result = chatRepository.getChatHistory(currentState.chatId)) {
+                is Result.Success -> {
+                    _chatState.update {
+                        it.copy(
+                            isLoading = false,
+                            messages = result.data
+                        )
+                    }
+
+                    _chatEvents.emit(ChatScreenEvents.MessageLoadedSuccessfully)
                 }
 
-                _chatEvents.emit(ChatScreenEvents.MessageLoadedSuccessfully)
+                is Result.Error -> {
+                    val errorMessage = when (result.error) {
+                        DataError.Network.UNAUTHORIZED -> "Session expired. Please login again."
+                        DataError.Network.NO_INTERNET -> "No internet connection"
+                        DataError.Network.SERVER_ERROR -> "Server error occurred"
+                        else -> "Failed to load messages"
+                    }
 
-            } catch (e: Exception) {
-                _chatState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "Failed to load messages"
-                    )
+                    _chatState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMessage
+                        )
+                    }
+                    _chatEvents.emit(ChatScreenEvents.ShowError(errorMessage))
                 }
-                _chatEvents.emit(ChatScreenEvents.ShowError("Failed to load messages"))
+            }
+        }
+    }
+
+    private fun createNewChat() {
+        viewModelScope.launch {
+            _chatState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
+            }
+
+            when (val result = chatRepository.createChat(
+                CreateChatDto(
+                    name = "New Chat",
+                    projectId = projectId
+                )
+            )) {
+                is Result.Success -> {
+                    _chatState.update {
+                        it.copy(
+                            isLoading = false,
+                            chatId = result.data.id
+                        )
+                    }
+                }
+
+                is Result.Error -> {
+                    val errorMessage = when (result.error) {
+                        DataError.Network.UNAUTHORIZED -> "Session expired. Please login again."
+                        DataError.Network.NO_INTERNET -> "No internet connection"
+                        DataError.Network.SERVER_ERROR -> "Server error occurred"
+                        else -> "Failed to create chat"
+                    }
+
+                    _chatState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMessage
+                        )
+                    }
+                    _chatEvents.emit(ChatScreenEvents.ShowError(errorMessage))
+                }
             }
         }
     }

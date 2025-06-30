@@ -3,6 +3,7 @@ package com.moksh.kontext.di
 import com.google.gson.Gson
 import com.moksh.kontext.BuildConfig
 import com.moksh.kontext.data.api.AuthApiService
+import com.moksh.kontext.data.api.ChatApiService
 import com.moksh.kontext.data.api.ProjectApiService
 import com.moksh.kontext.data.api.UserApiService
 import com.moksh.kontext.data.network.AuthInterceptor
@@ -99,5 +100,11 @@ object NetworkModule {
     @Singleton
     fun provideProjectApiService(retrofit: Retrofit): ProjectApiService {
         return retrofit.create(ProjectApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatApiService(retrofit: Retrofit): ChatApiService {
+        return retrofit.create(ChatApiService::class.java)
     }
 }

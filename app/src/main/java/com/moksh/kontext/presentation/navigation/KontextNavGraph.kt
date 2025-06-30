@@ -127,12 +127,17 @@ fun KontextNavGraph(
                     onNavigateBack = {
                         navController.popBackStack()
                     },
-                    onNavigateToChat = { projectId ->
-                        navController.navigate(HomeRoutes.ChatScreen(projectId = projectId)) {
+                    onNavigateToChat = { projectId, chatId ->
+                        navController.navigate(
+                            HomeRoutes.ChatScreen(
+                                projectId = projectId,
+                                chatId = chatId
+                            )
+                        ) {
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }
+                    },
                 )
             }
 

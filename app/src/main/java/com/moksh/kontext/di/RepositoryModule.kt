@@ -1,9 +1,11 @@
 package com.moksh.kontext.di
 
 import com.moksh.kontext.data.repository.AuthRepositoryImpl
+import com.moksh.kontext.data.repository.ChatRepositoryImpl
 import com.moksh.kontext.data.repository.ProjectRepositoryImpl
 import com.moksh.kontext.data.repository.UserRepositoryImpl
 import com.moksh.kontext.domain.repository.AuthRepository
+import com.moksh.kontext.domain.repository.ChatRepository
 import com.moksh.kontext.domain.repository.ProjectRepository
 import com.moksh.kontext.domain.repository.UserRepository
 import dagger.Binds
@@ -33,4 +35,10 @@ abstract class RepositoryModule {
     abstract fun bindProjectRepository(
         projectRepositoryImpl: ProjectRepositoryImpl
     ): ProjectRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindChatRepository(
+        chatRepositoryImpl: ChatRepositoryImpl
+    ): ChatRepository
 }
