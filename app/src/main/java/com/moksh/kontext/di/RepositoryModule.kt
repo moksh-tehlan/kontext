@@ -1,8 +1,10 @@
 package com.moksh.kontext.di
 
 import com.moksh.kontext.data.repository.AuthRepositoryImpl
+import com.moksh.kontext.data.repository.ProjectRepositoryImpl
 import com.moksh.kontext.data.repository.UserRepositoryImpl
 import com.moksh.kontext.domain.repository.AuthRepository
+import com.moksh.kontext.domain.repository.ProjectRepository
 import com.moksh.kontext.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -25,4 +27,10 @@ abstract class RepositoryModule {
     abstract fun bindUserRepository(
         userRepositoryImpl: UserRepositoryImpl
     ): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindProjectRepository(
+        projectRepositoryImpl: ProjectRepositoryImpl
+    ): ProjectRepository
 }

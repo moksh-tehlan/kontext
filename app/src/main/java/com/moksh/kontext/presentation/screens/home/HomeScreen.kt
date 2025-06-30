@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -164,11 +165,11 @@ fun HomeScreenView(
                 thickness = 0.5.dp
             )
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(count = 100) { projectName ->
+                items(state.projects) { project ->
                     ProjectItem(
-                        projectName = "Name",
+                        projectName = project.name,
                         onClick = {
-                            action(HomeScreenActions.OnProjectClick(projectName.toString()))
+                            action(HomeScreenActions.OnProjectClick(project.id))
                         }
                     )
                 }

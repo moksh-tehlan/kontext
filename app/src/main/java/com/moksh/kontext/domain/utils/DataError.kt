@@ -47,4 +47,11 @@ sealed interface DataError : Error {
         INVALID_PROFILE_DATA,
         INSUFFICIENT_PERMISSIONS
     }
+
+    enum class Project : DataError {
+        PROJECT_NOT_FOUND,
+        PROJECT_CREATE_FAILED,
+        PROJECT_UPDATE_FAILED,
+        PROJECT_DELETE_FAILED
+    }
 }

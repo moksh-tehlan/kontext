@@ -93,6 +93,12 @@ private fun mapApiErrorToDataError(statusCode: Int): Result.Error<DataError> {
             5101 -> DataError.User.INSUFFICIENT_PERMISSIONS
             5202 -> DataError.User.DUPLICATE_EMAIL
 
+            // Project Errors (6000-6099)
+            6001 -> DataError.Project.PROJECT_NOT_FOUND
+            6002 -> DataError.Project.PROJECT_CREATE_FAILED
+            6003 -> DataError.Project.PROJECT_UPDATE_FAILED
+            6004 -> DataError.Project.PROJECT_DELETE_FAILED
+
             // Fallback for auth error range
             in 4000..4399 -> DataError.Auth.AUTHENTICATION_FAILED
 

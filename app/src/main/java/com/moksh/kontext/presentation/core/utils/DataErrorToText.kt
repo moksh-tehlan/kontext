@@ -44,5 +44,10 @@ fun DataError.asUiText(): UiText {
         DataError.User.PROFILE_UPDATE_FAILED -> UiText.StringResource(R.string.error_profile_update_failed)
         DataError.User.INVALID_PROFILE_DATA -> UiText.StringResource(R.string.error_invalid_profile_data)
         DataError.User.INSUFFICIENT_PERMISSIONS -> UiText.StringResource(R.string.error_insufficient_permissions)
+
+        DataError.Project.PROJECT_NOT_FOUND -> UiText.StringResource(R.string.error_project_not_found)
+        DataError.Project.PROJECT_CREATE_FAILED -> UiText.StringResource(R.string.error_project_create_failed)
+        DataError.Project.PROJECT_UPDATE_FAILED -> UiText.StringResource(R.string.error_project_update_failed)
+        DataError.Project.PROJECT_DELETE_FAILED -> UiText.StringResource(R.string.error_project_delete_failed)
     }
 }

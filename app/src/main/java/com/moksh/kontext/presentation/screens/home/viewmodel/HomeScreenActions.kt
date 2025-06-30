@@ -9,4 +9,5 @@ sealed interface HomeScreenActions {
     data class ProjectDescriptionChange(val description: String) : HomeScreenActions
     data object CreateNewProject : HomeScreenActions
     data class DeleteProject(val projectId: String) : HomeScreenActions
+    data object RefreshProjects : HomeScreenActions
 }
