@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.JsonSyntaxException
 import com.moksh.kontext.data.model.ApiResponse
 import com.moksh.kontext.data.model.ErrorResponse
+import com.moksh.kontext.domain.manager.AuthSessionManager
 import com.moksh.kontext.domain.repository.AuthRepository
 import com.moksh.kontext.domain.utils.DataError
 import com.moksh.kontext.domain.utils.Result
@@ -33,9 +34,13 @@ suspend inline fun <T> safeCall(
                 }
 
                 is Result.Error -> {
-                    Log.d("SafeCall", "Token refresh failed, clearing session")
-                    // Token refresh failed, clear session and return unauthorized
-                    authRepository.clearSession()
+
+                    Log.e("SafeCall", "Logout failed during token refresh fallback")
+                    authRepository.clearSession() // Fallback to just clearing session
+
+                    // Notify global session manager about auth expiry
+                    AuthSessionManager.getInstance()?.notifyAuthExpired()
+                    
                     Result.Error(DataError.Network.UNAUTHORIZED)
                 }
             }
@@ -57,9 +62,9 @@ fun shouldRefreshToken(error: DataError): Boolean {
         DataError.Auth.JWT_TOKEN_MALFORMED,
         DataError.Auth.JWT_TOKEN_MISSING,
         DataError.Auth.JWT_SIGNATURE_INVALID,
+        DataError.Auth.TOKEN_BLACKLISTED,
         DataError.Auth.ACCESS_TOKEN_INVALID -> true
 
-        DataError.Auth.TOKEN_BLACKLISTED,
         DataError.Auth.INVALID_REFRESH_TOKEN -> false // Don't retry for these
         else -> false
     }
