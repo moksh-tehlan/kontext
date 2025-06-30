@@ -7,5 +7,13 @@ data class ProjectScreenState(
     val chats: List<ChatDto> = emptyList(),
     val errorMessage: String? = null,
     val projectId: String? = null,
-    val projectName: String = "Project Name"
+    val projectName: String = "Project Name",
+    val agentInstruction: String? = null
+)
+
+data class CustomInstructionDialogState(
+    val isVisible: Boolean = false,
+    val isLoading: Boolean = false,
+    val instruction: String = "",
+    val errorMessage: String? = null
 )

@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.moksh.kontext.presentation.common.ProfilePicture
 import com.moksh.kontext.presentation.common.profileIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
+import com.moksh.kontext.presentation.core.utils.DateUtils
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
 import com.moksh.kontext.presentation.screens.home.components.CreateProjectBottomSheet
 import com.moksh.kontext.presentation.screens.home.components.ProjectItem
@@ -177,6 +178,7 @@ fun HomeScreenView(
                 items(state.projects) { project ->
                     ProjectItem(
                         projectName = project.name,
+                        date = DateUtils.formatDateString(project.updatedAt),
                         onClick = {
                             action(HomeScreenActions.OnProjectClick(project.id))
                         }

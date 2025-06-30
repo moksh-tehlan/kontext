@@ -9,6 +9,8 @@ data class Project(
     val name: String,
     @SerializedName("description")
     val description: String?,
+    @SerializedName("agentInstruction")
+    val agentInstruction: String?,
     @SerializedName("createdAt")
     val createdAt: String,
     @SerializedName("updatedAt")

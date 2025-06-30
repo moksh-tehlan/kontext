@@ -22,7 +22,9 @@ class ProjectRepositoryImpl @Inject constructor(
         return when (val result = safeCall { projectApiService.getAllProjects() }) {
             is Result.Success -> {
                 result.data.data?.let { projects ->
-                    Result.Success(projects.map { it.toDto() })
+                    val sortedProjects = projects.map { it.toDto() }
+                        .sortedByDescending { it.updatedAt }
+                    Result.Success(sortedProjects)
                 } ?: Result.Error(DataError.Network.EMPTY_RESPONSE)
             }
 

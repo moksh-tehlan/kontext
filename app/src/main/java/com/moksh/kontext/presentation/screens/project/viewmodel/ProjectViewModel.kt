@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moksh.kontext.domain.model.UpdateProjectDto
 import com.moksh.kontext.domain.repository.ChatRepository
+import com.moksh.kontext.domain.repository.ProjectRepository
 import com.moksh.kontext.domain.utils.Result
 import com.moksh.kontext.presentation.core.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +26,7 @@ import javax.inject.Inject
 class ProjectViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val chatRepository: ChatRepository,
+    private val projectRepository: ProjectRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -38,7 +41,8 @@ class ProjectViewModel @Inject constructor(
     )
     val projectState = _projectState.asStateFlow()
         .onStart {
-            // Load chats when screen starts
+            // Load project details and chats when screen starts
+            loadProjectDetails()
             loadChats()
         }
         .stateIn(
@@ -48,6 +52,14 @@ class ProjectViewModel @Inject constructor(
                 projectId = projectId,
                 projectName = projectName
             )
+        )
+
+    private val _customInstructionDialogState = MutableStateFlow(CustomInstructionDialogState())
+    val customInstructionDialogState = _customInstructionDialogState.asStateFlow()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            CustomInstructionDialogState()
         )
 
     private val _projectEvents = MutableSharedFlow<ProjectScreenEvents>()
@@ -69,6 +81,62 @@ class ProjectViewModel @Inject constructor(
 
             is ProjectScreenActions.CreateNewChat -> {
                 createNewChat()
+            }
+
+            is ProjectScreenActions.ShowCustomInstructionDialog -> {
+                val currentInstruction = _projectState.value.agentInstruction ?: ""
+                _customInstructionDialogState.update {
+                    it.copy(
+                        isVisible = true,
+                        isLoading = false,
+                        instruction = currentInstruction,
+                        errorMessage = null
+                    )
+                }
+            }
+
+            is ProjectScreenActions.HideCustomInstructionDialog -> {
+                _customInstructionDialogState.update {
+                    it.copy(
+                        isVisible = false,
+                        isLoading = false,
+                        instruction = "",
+                        errorMessage = null
+                    )
+                }
+            }
+
+            is ProjectScreenActions.InstructionChange -> {
+                _customInstructionDialogState.update {
+                    it.copy(
+                        instruction = action.instruction,
+                        errorMessage = null
+                    )
+                }
+            }
+
+            is ProjectScreenActions.SaveCustomInstruction -> {
+                saveCustomInstruction()
+            }
+        }
+    }
+
+    private fun loadProjectDetails() {
+        viewModelScope.launch {
+            when (val result = projectRepository.getProject(projectId)) {
+                is Result.Success -> {
+                    _projectState.update {
+                        it.copy(
+                            agentInstruction = result.data.agentInstruction,
+                            projectName = result.data.name
+                        )
+                    }
+                }
+
+                is Result.Error -> {
+                    // Handle error silently or show a subtle error
+                    // Not updating error message as this is a background operation
+                }
             }
         }
     }
@@ -121,6 +189,57 @@ class ProjectViewModel @Inject constructor(
     private fun createNewChat() {
         viewModelScope.launch {
             _projectEvents.emit(ProjectScreenEvents.NavigateToChat(projectId, "new_chat"))
+        }
+    }
+
+    private fun saveCustomInstruction() {
+        viewModelScope.launch {
+            val currentInstruction = _customInstructionDialogState.value.instruction
+
+            if (currentInstruction.isBlank()) {
+                _customInstructionDialogState.update {
+                    it.copy(errorMessage = "Instruction cannot be empty")
+                }
+                return@launch
+            }
+
+            _customInstructionDialogState.update {
+                it.copy(isLoading = true, errorMessage = null)
+            }
+
+            when (val result = projectRepository.updateProject(
+                projectId = projectId,
+                updateProjectDto = UpdateProjectDto(agentInstruction = currentInstruction)
+            )) {
+                is Result.Success -> {
+                    _customInstructionDialogState.update {
+                        it.copy(
+                            isLoading = false,
+                            isVisible = false,
+                            instruction = "",
+                            errorMessage = null
+                        )
+                    }
+
+                    // Update the project state with the saved instruction
+                    _projectState.update {
+                        it.copy(agentInstruction = currentInstruction)
+                    }
+
+                    _projectEvents.emit(ProjectScreenEvents.CustomInstructionSavedSuccessfully)
+                }
+
+                is Result.Error -> {
+                    val errorMessage = result.error.asUiText().asString(context)
+                    _customInstructionDialogState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMessage
+                        )
+                    }
+                    _projectEvents.emit(ProjectScreenEvents.ShowError(errorMessage))
+                }
+            }
         }
     }
 }

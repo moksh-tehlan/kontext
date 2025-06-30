@@ -4,6 +4,7 @@ data class ProjectDto(
     val id: String,
     val name: String,
     val description: String?,
+    val agentInstruction: String?,
     val createdAt: String,
     val updatedAt: String
 )

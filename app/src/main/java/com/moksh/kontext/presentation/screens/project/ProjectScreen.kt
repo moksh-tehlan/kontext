@@ -20,12 +20,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -36,14 +41,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.moksh.kontext.presentation.common.backArrowIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
+import com.moksh.kontext.presentation.core.utils.DateUtils
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
 import com.moksh.kontext.presentation.screens.home.components.ProjectItem
 import com.moksh.kontext.presentation.screens.project.components.CustomInstruction
+import com.moksh.kontext.presentation.screens.project.components.CustomInstructionDialog
 import com.moksh.kontext.presentation.screens.project.components.ProjectKnowledge
 import com.moksh.kontext.presentation.screens.project.viewmodel.ProjectScreenActions
 import com.moksh.kontext.presentation.screens.project.viewmodel.ProjectScreenEvents
 import com.moksh.kontext.presentation.screens.project.viewmodel.ProjectViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectScreen(
     onNavigateBack: () -> Unit = {},
@@ -51,11 +60,17 @@ fun ProjectScreen(
     viewModel: ProjectViewModel = hiltViewModel()
 ) {
     val projectState by viewModel.projectState.collectAsState()
+    val customInstructionDialogState by viewModel.customInstructionDialogState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
     ObserveAsEvents(flow = viewModel.projectEvents) { event ->
         when (event) {
             is ProjectScreenEvents.ShowError -> {
-                // Handle error display (could use SnackBar)
+                scope.launch { snackbarHostState.showSnackbar(event.message) }
             }
 
             is ProjectScreenEvents.NavigateToChat -> {
@@ -65,11 +80,27 @@ fun ProjectScreen(
             is ProjectScreenEvents.ChatsLoadedSuccessfully -> {
                 // Handle successful load if needed
             }
+
+            is ProjectScreenEvents.CustomInstructionSavedSuccessfully -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Custom instruction saved successfully!")
+                }
+            }
+
+            is ProjectScreenEvents.CloseCustomInstructionDialog -> {
+                scope.launch {
+                    bottomSheetState.hide()
+                }
+            }
         }
     }
 
     ProjectScreenView(
         projectState = projectState,
+        customInstructionDialogState = customInstructionDialogState,
+        snackbarHostState = snackbarHostState,
+        bottomSheetState = bottomSheetState,
+        scope = scope,
         onNavigateBack = onNavigateBack,
         onAction = viewModel::onAction
     )
@@ -79,6 +110,12 @@ fun ProjectScreen(
 @Composable
 fun ProjectScreenView(
     projectState: com.moksh.kontext.presentation.screens.project.viewmodel.ProjectScreenState = com.moksh.kontext.presentation.screens.project.viewmodel.ProjectScreenState(),
+    customInstructionDialogState: com.moksh.kontext.presentation.screens.project.viewmodel.CustomInstructionDialogState = com.moksh.kontext.presentation.screens.project.viewmodel.CustomInstructionDialogState(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    bottomSheetState: androidx.compose.material3.SheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    ),
+    scope: kotlinx.coroutines.CoroutineScope = rememberCoroutineScope(),
     onNavigateBack: () -> Unit = {},
     onAction: (ProjectScreenActions) -> Unit = {}
 ) {
@@ -89,6 +126,7 @@ fun ProjectScreenView(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = MaterialTheme.colorScheme.surface,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             LargeTopAppBar(
                 title = {
@@ -158,7 +196,7 @@ fun ProjectScreenView(
                         )
                         CustomInstruction(
                             modifier = Modifier.weight(1f),
-                            onClick = {}
+                            onClick = { onAction(ProjectScreenActions.ShowCustomInstructionDialog) }
                         )
                     }
                 }
@@ -193,6 +231,7 @@ fun ProjectScreenView(
                     items(projectState.chats) { chat ->
                         ProjectItem(
                             projectName = chat.name,
+                            date = DateUtils.formatDateString(chat.updatedAt),
                             onClick = {
                                 onAction(ProjectScreenActions.NavigateToChat(chat.id))
                             }
@@ -230,8 +269,27 @@ fun ProjectScreenView(
             }
         }
     }
+
+    // Custom Instruction Dialog
+    if (customInstructionDialogState.isVisible) {
+        CustomInstructionDialog(
+            onDismiss = {
+                scope.launch {
+                    bottomSheetState.hide().apply {
+                        onAction(ProjectScreenActions.HideCustomInstructionDialog)
+                    }
+                }
+            },
+            sheetState = bottomSheetState,
+            isLoading = customInstructionDialogState.isLoading,
+            instruction = customInstructionDialogState.instruction,
+            onInstructionChange = { onAction(ProjectScreenActions.InstructionChange(it)) },
+            onSaveInstruction = { onAction(ProjectScreenActions.SaveCustomInstruction) }
+        )
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun ProjectScreenViewPreview() {

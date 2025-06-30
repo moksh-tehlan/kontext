@@ -12,6 +12,7 @@ fun Project.toDto(): ProjectDto {
         id = id,
         name = name,
         description = description,
+        agentInstruction = agentInstruction,
         createdAt = createdAt,
         updatedAt = updatedAt
     )
@@ -27,6 +28,7 @@ fun CreateProjectDto.toRequest(): CreateProjectRequest {
 fun UpdateProjectDto.toRequest(): UpdateProjectRequest {
     return UpdateProjectRequest(
         name = name,
-        description = description
+        description = description,
+        agentInstruction = agentInstruction
     )
 }

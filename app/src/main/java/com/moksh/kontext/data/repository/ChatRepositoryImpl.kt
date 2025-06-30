@@ -65,7 +65,9 @@ class ChatRepositoryImpl @Inject constructor(
         return when (val result = safeCall { chatApiService.getProjectChats(projectId) }) {
             is Result.Success -> {
                 result.data.data?.let { chats ->
-                    Result.Success(chats.map { it.toDto() })
+                    val sortedChats = chats.map { it.toDto() }
+                        .sortedByDescending { it.updatedAt }
+                    Result.Success(sortedChats)
                 } ?: Result.Error(DataError.Network.EMPTY_RESPONSE)
             }
 

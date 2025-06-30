@@ -6,5 +6,7 @@ data class UpdateProjectRequest(
     @SerializedName("name")
     val name: String? = null,
     @SerializedName("description")
-    val description: String? = null
+    val description: String? = null,
+    @SerializedName("agentInstruction")
+    val agentInstruction: String? = null
 )
