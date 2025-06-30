@@ -107,7 +107,7 @@ class AuthInterceptor @Inject constructor(
                     .toRequestBody("application/json".toMediaType())
 
                 val request = Request.Builder()
-                    .url("${baseUrl}api/v1/auth/refresh")
+                    .url("${baseUrl}/api/v1/auth/refresh")
                     .post(requestBody)
                     .build()
 
