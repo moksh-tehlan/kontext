@@ -11,6 +11,8 @@ interface AuthRepository {
 
     suspend fun login(email: String, otp: String): Result<AuthDto, DataError>
 
+    suspend fun googleLogin(idToken: String): Result<AuthDto, DataError>
+
     suspend fun refreshToken(): Result<AuthDto, DataError>
 
     suspend fun logout(): EmptyResult<DataError>

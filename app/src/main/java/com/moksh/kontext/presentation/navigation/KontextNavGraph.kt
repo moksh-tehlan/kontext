@@ -75,6 +75,13 @@ fun KontextNavGraph(
                 AuthScreen(
                     onNavigateToOtp = {email ->
                         navController.navigate(AuthRoutes.OtpScreen(email = email))
+                    },
+                    onNavigateToHome = {
+                        navController.navigate(Graphs.HomeGraph) {
+                            popUpTo(Graphs.AuthGraph) {
+                                inclusive = true
+                            }
+                        }
                     }
                 )
             }

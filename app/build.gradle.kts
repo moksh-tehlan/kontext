@@ -46,6 +46,11 @@ android {
             "API_TIMEOUT_SECONDS",
             "${devEnv.getProperty("API_TIMEOUT_SECONDS") ?: "30"}L"
         )
+        buildConfigField(
+            "String",
+            "GCP_CLIENT_ID",
+            "\"${devEnv.getProperty("GCP_CLIENT_ID") ?: ""}\""
+        )
     }
 
     signingConfigs {
@@ -99,6 +104,11 @@ android {
                 "API_TIMEOUT_SECONDS",
                 "${devEnv.getProperty("API_TIMEOUT_SECONDS") ?: "30"}L"
             )
+            buildConfigField(
+                "String",
+                "GCP_CLIENT_ID",
+                "\"${devEnv.getProperty("GCP_CLIENT_ID") ?: ""}\""
+            )
         }
         release {
             signingConfig = signingConfigs.getByName("production")
@@ -123,6 +133,11 @@ android {
                 "long",
                 "API_TIMEOUT_SECONDS",
                 "${prodEnv.getProperty("API_TIMEOUT_SECONDS") ?: "60"}L"
+            )
+            buildConfigField(
+                "String",
+                "GCP_CLIENT_ID",
+                "\"${prodEnv.getProperty("GCP_CLIENT_ID") ?: ""}\""
             )
         }
     }
@@ -173,6 +188,11 @@ dependencies {
     // Shared Preferences
     implementation(libs.androidx.shared.preferences)
     implementation(libs.androidx.security.crypto)
+
+    // Credential Manager (modern Google Sign-In)
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -20,6 +20,11 @@ data class RefreshTokenRequest(
     val refreshToken: String
 )
 
+data class GoogleLoginRequest(
+    @SerializedName("idToken")
+    val idToken: String
+)
+
 data class AuthResponse(
     @SerializedName("accessToken")
     val accessToken: String,
