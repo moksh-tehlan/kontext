@@ -15,7 +15,8 @@ fun User.toDto(): UserDto {
         authProvider = authProvider,
         isEmailVerified = isEmailVerified,
         role = role,
-        isActive = isActive
+        isActive = isActive,
+        profilePictureUrl = profilePictureUrl
     )
 }
 
@@ -34,7 +35,8 @@ fun UserDto.toModel(): User {
         nickname = nickname,
         authProvider = authProvider,
         isEmailVerified = isEmailVerified,
-        role = role
+        role = role,
+        profilePictureUrl = profilePictureUrl
     )
 }
 

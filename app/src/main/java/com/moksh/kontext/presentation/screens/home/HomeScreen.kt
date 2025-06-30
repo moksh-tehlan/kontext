@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.moksh.kontext.presentation.common.ProfilePicture
 import com.moksh.kontext.presentation.common.profileIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
@@ -128,12 +129,20 @@ fun HomeScreenView(
                     IconButton(
                         onClick = { navigateToSettings() }
                     ) {
-                        Icon(
-                            modifier = Modifier.size(28.dp),
-                            imageVector = profileIcon,
-                            contentDescription = "Settings",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
+                        if (state.currentUser != null) {
+                            ProfilePicture(
+                                profilePictureUrl = state.currentUser.profilePictureUrl,
+                                fullName = state.currentUser.fullName,
+                                size = 28.dp
+                            )
+                        } else {
+                            Icon(
+                                modifier = Modifier.size(28.dp),
+                                imageVector = profileIcon,
+                                contentDescription = "Settings",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                 }
             )

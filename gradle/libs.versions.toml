@@ -1,5 +1,8 @@
 [versions]
 agp = "8.10.1"
+credentialsPlayServicesAuth = "1.5.0"
+credentials = "1.5.0"
+googleid = "1.1.1"
 kotlin = "2.1.21"
 kotlinxSerialization = "1.8.1"
 coreKtx = "1.16.0"
@@ -18,9 +21,13 @@ retrofit = "2.11.0"
 okhttp = "4.12.0"
 sharedPreferences = "1.2.1"
 securityCrypto = "1.1.0-beta01"
+coil = "2.2.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -46,6 +53,7 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 androidx-shared-preferences = { group = "androidx.preference", name = "preference-ktx", version.ref = "sharedPreferences" }
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

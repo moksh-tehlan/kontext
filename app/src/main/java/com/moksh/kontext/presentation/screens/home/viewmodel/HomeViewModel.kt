@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moksh.kontext.domain.model.CreateProjectDto
 import com.moksh.kontext.domain.repository.ProjectRepository
+import com.moksh.kontext.domain.repository.UserRepository
 import com.moksh.kontext.domain.utils.Result
 import com.moksh.kontext.presentation.core.utils.asUiText
 import com.moksh.kontext.presentation.screens.home.viewmodel.HomeScreenEvents.NavigateToProject
@@ -24,13 +25,15 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _homeState = MutableStateFlow(HomeScreenState())
     val homeState = _homeState.asStateFlow()
         .onStart {
             loadProjects()
+            loadCurrentUser()
         }
         .stateIn(
             viewModelScope,
@@ -222,6 +225,15 @@ class HomeViewModel @Inject constructor(
                     val errorMessage = result.error.asUiText().asString(context)
                     _homeEvents.emit(HomeScreenEvents.ShowError(errorMessage))
                 }
+            }
+        }
+    }
+
+    private fun loadCurrentUser() {
+        viewModelScope.launch {
+            val cachedUser = userRepository.getCachedUser()
+            _homeState.update {
+                it.copy(currentUser = cachedUser)
             }
         }
     }

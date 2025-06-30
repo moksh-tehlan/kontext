@@ -37,6 +37,7 @@ class UserPreferences @Inject constructor(
             putBoolean(USER_EMAIL_VERIFIED_KEY, user.isEmailVerified)
             putString(USER_ROLE_KEY, user.role)
             putBoolean(USER_IS_ACTIVE_KEY, user.isActive)
+            putString(USER_PROFILE_PICTURE_URL_KEY, user.profilePictureUrl)
         }
     }
 
@@ -48,6 +49,8 @@ class UserPreferences @Inject constructor(
         val nickname = sharedPreferences.getString(USER_NICKNAME_KEY, null) ?: return null
         val authProvider = sharedPreferences.getString(USER_AUTH_PROVIDER_KEY, null) ?: return null
         val role = sharedPreferences.getString(USER_ROLE_KEY, null) ?: return null
+        val profilePicture =
+            sharedPreferences.getString(USER_PROFILE_PICTURE_URL_KEY, null) ?: return null
 
         return UserDto(
             id = id,
@@ -58,7 +61,8 @@ class UserPreferences @Inject constructor(
             authProvider = authProvider,
             isEmailVerified = sharedPreferences.getBoolean(USER_EMAIL_VERIFIED_KEY, false),
             role = role,
-            isActive = sharedPreferences.getBoolean(USER_IS_ACTIVE_KEY, true)
+            isActive = sharedPreferences.getBoolean(USER_IS_ACTIVE_KEY, true),
+            profilePictureUrl = profilePicture
         )
     }
 
@@ -73,6 +77,7 @@ class UserPreferences @Inject constructor(
             remove(USER_EMAIL_VERIFIED_KEY)
             remove(USER_ROLE_KEY)
             remove(USER_IS_ACTIVE_KEY)
+            remove(USER_PROFILE_PICTURE_URL_KEY)
         }
     }
 
@@ -91,5 +96,6 @@ class UserPreferences @Inject constructor(
         private const val USER_EMAIL_VERIFIED_KEY = "user_email_verified"
         private const val USER_ROLE_KEY = "user_role"
         private const val USER_IS_ACTIVE_KEY = "user_is_active"
+        private const val USER_PROFILE_PICTURE_URL_KEY = "user_profile_picture_url"
     }
 }

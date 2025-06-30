@@ -29,6 +29,8 @@ data class User(
     val authProvider: String,
     @SerializedName("isEmailVerified")
     val isEmailVerified: Boolean,
+    @SerializedName("profilePictureUrl")
+    val profilePictureUrl: String?,
     @SerializedName("role")
     val role: String
 )

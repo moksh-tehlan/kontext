@@ -8,6 +8,7 @@ data class UserDto(
     val nickname: String,
     val authProvider: String,
     val isEmailVerified: Boolean,
+    val profilePictureUrl: String?,
     val role: String,
     val isActive: Boolean
 ) {
