@@ -9,12 +9,18 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-// Load local.properties
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localProperties.load(localPropertiesFile.inputStream())
+// Load environment variables from .env files
+fun loadEnvFile(fileName: String): Properties {
+    val envFile = rootProject.file(fileName)
+    val properties = Properties()
+    if (envFile.exists()) {
+        properties.load(envFile.inputStream())
+    }
+    return properties
 }
+
+val devEnv = loadEnvFile(".env.dev")
+val prodEnv = loadEnvFile(".env.prod")
 
 android {
     namespace = "com.moksh.kontext"
@@ -29,25 +35,94 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // BuildConfig fields from local.properties
+        // Default BuildConfig fields (will be overridden by build variants)
         buildConfigField(
             "String",
             "API_BASE_URL",
-            "\"${localProperties.getProperty("API_BASE_URL")}\""
+            "\"${devEnv.getProperty("API_BASE_URL") ?: ""}\""
         )
         buildConfigField(
             "long",
             "API_TIMEOUT_SECONDS",
-            "${localProperties.getProperty("API_TIMEOUT_SECONDS", "30")}L"
+            "${devEnv.getProperty("API_TIMEOUT_SECONDS") ?: "30"}L"
         )
     }
 
+    signingConfigs {
+        create("development") {
+            storeFile = file(devEnv.getProperty("KEYSTORE_FILE") ?: "debug.keystore")
+            storePassword = devEnv.getProperty("KEYSTORE_PASSWORD") ?: "android"
+            keyAlias = devEnv.getProperty("KEY_ALIAS") ?: "kontext-alias"
+            keyPassword = devEnv.getProperty("KEY_PASSWORD") ?: "android"
+        }
+        create("production") {
+            storeFile = file(prodEnv.getProperty("KEYSTORE_FILE") ?: "")
+            storePassword = prodEnv.getProperty("KEYSTORE_PASSWORD") ?: ""
+            keyAlias = prodEnv.getProperty("KEY_ALIAS") ?: ""
+            keyPassword = prodEnv.getProperty("KEY_PASSWORD") ?: ""
+        }
+    }
+
+    flavorDimensions += "environment"
+
+    productFlavors {
+        create("development") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            resValue("string", "app_name", "Kontext Dev")
+        }
+        create("production") {
+            dimension = "environment"
+            resValue("string", "app_name", "Kontext")
+        }
+    }
+
     buildTypes {
-        release {
+        debug {
+            signingConfig = signingConfigs.getByName("development")
+            isDebuggable = true
             isMinifyEnabled = false
+
+            buildConfigField(
+                "String",
+                "BUILD_VARIANT",
+                "\"development\""
+            )
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"${devEnv.getProperty("API_BASE_URL") ?: ""}\""
+            )
+            buildConfigField(
+                "long",
+                "API_TIMEOUT_SECONDS",
+                "${devEnv.getProperty("API_TIMEOUT_SECONDS") ?: "30"}L"
+            )
+        }
+        release {
+            signingConfig = signingConfigs.getByName("production")
+            isMinifyEnabled = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
+            )
+
+            buildConfigField(
+                "String",
+                "BUILD_VARIANT",
+                "\"production\""
+            )
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"${prodEnv.getProperty("API_BASE_URL") ?: ""}\""
+            )
+            buildConfigField(
+                "long",
+                "API_TIMEOUT_SECONDS",
+                "${prodEnv.getProperty("API_TIMEOUT_SECONDS") ?: "60"}L"
             )
         }
     }
