@@ -35,4 +35,7 @@ sealed interface HomeRoutes : Routes {
 
     @Serializable
     data object SettingsScreen : HomeRoutes
+
+    @Serializable
+    data class ChatScreen(val projectId: String) : HomeRoutes
 }

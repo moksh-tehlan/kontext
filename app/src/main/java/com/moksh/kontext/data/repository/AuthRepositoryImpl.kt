@@ -11,6 +11,7 @@ import com.moksh.kontext.data.model.auth.SendOtpRequest
 import com.moksh.kontext.data.utils.safeCall
 import com.moksh.kontext.domain.model.AuthDto
 import com.moksh.kontext.domain.repository.AuthRepository
+import com.moksh.kontext.domain.repository.UserRepository
 import com.moksh.kontext.domain.utils.DataError
 import com.moksh.kontext.domain.utils.EmptyResult
 import com.moksh.kontext.domain.utils.Result
@@ -22,7 +23,8 @@ import javax.inject.Singleton
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val authApiService: AuthApiService,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val userRepository: UserRepository
 ) : AuthRepository {
 
     override suspend fun sendOtp(email: String): EmptyResult<DataError> {
@@ -39,6 +41,7 @@ class AuthRepositoryImpl @Inject constructor(
                         accessToken = authResponse.accessToken,
                         refreshToken = authResponse.refreshToken
                     )
+                    userRepository.cacheUser(authResponse.user.toDto())
                     Result.Success(authResponse.toDto())
                 } ?: Result.Error(DataError.Network.EMPTY_RESPONSE)
             }
@@ -62,6 +65,7 @@ class AuthRepositoryImpl @Inject constructor(
                         accessToken = authResponse.accessToken,
                         refreshToken = authResponse.refreshToken
                     )
+                    userRepository.cacheUser(authResponse.user.toDto())
                     Result.Success(authResponse.toDto())
                 } ?: Result.Error(DataError.Network.EMPTY_RESPONSE).also {
                     Log.e("AuthRepositoryImpl", "Empty response from API")
@@ -87,6 +91,7 @@ class AuthRepositoryImpl @Inject constructor(
                         accessToken = authResponse.accessToken,
                         refreshToken = authResponse.refreshToken
                     )
+                    userRepository.cacheUser(authResponse.user.toDto())
                     Result.Success(authResponse.toDto())
                 } ?: Result.Error(DataError.Network.EMPTY_RESPONSE)
             }
@@ -100,6 +105,7 @@ class AuthRepositoryImpl @Inject constructor(
             authApiService.logout()
         }.map {
             tokenManager.clearTokens()
+            userRepository.clearCachedUser()
         }
     }
 
@@ -109,5 +115,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun clearSession() {
         tokenManager.clearTokens()
+        // Note: clearCachedUser is suspend function, so we can't call it here
+        // ViewModels should handle clearing cached user data when needed
     }
 }

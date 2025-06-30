@@ -30,17 +30,20 @@ import com.moksh.kontext.presentation.screens.project.components.ProjectKnowledg
 
 @Composable
 fun ProjectScreen(
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onNavigateToChat: (String) -> Unit = {}
 ) {
     ProjectScreenView(
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        onNavigateToChat = onNavigateToChat
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectScreenView(
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onNavigateToChat: (String) -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState()
@@ -110,8 +113,13 @@ fun ProjectScreenView(
                     )
                 )
             }
-            items(count = 50) {
-                ProjectItem(projectName = "Name", onClick = {})
+            items(count = 50) { index ->
+                ProjectItem(
+                    projectName = "Chat ${index + 1}",
+                    onClick = {
+                        onNavigateToChat("project_id_$index")
+                    }
+                )
             }
         }
     }

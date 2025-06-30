@@ -93,6 +93,22 @@ class ProfileViewModel @Inject constructor(
 
     private fun loadUserProfile() {
         viewModelScope.launch {
+            // First try to load from cache
+            val cachedUser = userRepository.getCachedUser()
+            if (cachedUser != null) {
+                _state.value = _state.value.copy(
+                    userId = cachedUser.id,
+                    fullName = cachedUser.fullName,
+                    nickname = cachedUser.nickname,
+                    email = cachedUser.email,
+                    firstName = cachedUser.firstName,
+                    lastName = cachedUser.lastName,
+                    isLoading = false
+                )
+                return@launch
+            }
+
+            // If no cached user, fetch from network
             _state.value = _state.value.copy(isLoading = true)
             when (val result = userRepository.getCurrentUser()) {
                 is Result.Success -> {

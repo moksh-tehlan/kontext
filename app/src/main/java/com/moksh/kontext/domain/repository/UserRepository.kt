@@ -12,4 +12,10 @@ interface UserRepository {
     suspend fun updateUser(userId: String, updateUserDto: UpdateUserDto): Result<UserDto, DataError>
 
     suspend fun deleteCurrentUser(): Result<Unit, DataError>
+
+    suspend fun getCachedUser(): UserDto?
+
+    suspend fun cacheUser(user: UserDto)
+
+    suspend fun clearCachedUser()
 }

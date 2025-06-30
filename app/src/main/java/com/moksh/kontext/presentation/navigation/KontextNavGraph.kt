@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.moksh.kontext.presentation.screens.auth.AuthScreen
+import com.moksh.kontext.presentation.screens.chat.ChatScreen
 import com.moksh.kontext.presentation.screens.home.HomeScreen
 import com.moksh.kontext.presentation.screens.otp.OtpScreen
 import com.moksh.kontext.presentation.screens.profile.ProfileScreen
@@ -123,6 +124,20 @@ fun KontextNavGraph(
             }
             composable<HomeRoutes.ProjectScreen> {
                 ProjectScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToChat = { projectId ->
+                        navController.navigate(HomeRoutes.ChatScreen(projectId = projectId)) {
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
+
+            composable<HomeRoutes.ChatScreen> {
+                ChatScreen(
                     onNavigateBack = {
                         navController.popBackStack()
                     }
