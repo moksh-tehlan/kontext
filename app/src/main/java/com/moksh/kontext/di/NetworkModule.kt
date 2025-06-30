@@ -1,5 +1,6 @@
 package com.moksh.kontext.di
 
+import com.google.gson.Gson
 import com.moksh.kontext.BuildConfig
 import com.moksh.kontext.data.api.AuthApiService
 import com.moksh.kontext.data.api.UserApiService
@@ -13,6 +14,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -21,10 +23,36 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideGson(): Gson {
+        return Gson()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBaseUrl(): String {
+        return BuildConfig.API_BASE_URL
+    }
+
+    @Provides
+    @Singleton
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
+    }
+
+    @Provides
+    @Singleton
+    @Named("refresh_client")
+    fun provideRefreshOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(BuildConfig.API_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(BuildConfig.API_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(BuildConfig.API_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .build()
     }
 
     @Provides

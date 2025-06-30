@@ -4,8 +4,6 @@ import android.util.Log
 import com.google.gson.JsonSyntaxException
 import com.moksh.kontext.data.model.ApiResponse
 import com.moksh.kontext.data.model.ErrorResponse
-import com.moksh.kontext.domain.manager.AuthSessionManager
-import com.moksh.kontext.domain.repository.AuthRepository
 import com.moksh.kontext.domain.utils.DataError
 import com.moksh.kontext.domain.utils.Result
 import retrofit2.Response
@@ -13,60 +11,18 @@ import java.net.SocketTimeoutException
 
 typealias GenericResponse<T> = ApiResponse<T>
 
-suspend inline fun <T> safeCall(
-    authRepository: AuthRepository? = null,
+inline fun <T> safeCall(
     call: () -> Response<ApiResponse<T>>
 ): Result<ApiResponse<T>, DataError> {
     return try {
         val response = call()
-        val result = responseToResult(response)
-
-        // Check if it's a JWT error that requires token refresh and authRepository is provided
-        if (result is Result.Error && authRepository != null && shouldRefreshToken(result.error)) {
-            Log.d("SafeCall", "JWT error detected, attempting token refresh")
-
-            when (authRepository.refreshToken()) {
-                is Result.Success -> {
-                    Log.d("SafeCall", "Token refreshed successfully, retrying original call")
-                    // Token refreshed successfully, retry the original call
-                    val retryResponse = call()
-                    responseToResult(retryResponse)
-                }
-
-                is Result.Error -> {
-
-                    Log.e("SafeCall", "Logout failed during token refresh fallback")
-                    authRepository.clearSession() // Fallback to just clearing session
-
-                    // Notify global session manager about auth expiry
-                    AuthSessionManager.getInstance()?.notifyAuthExpired()
-                    
-                    Result.Error(DataError.Network.UNAUTHORIZED)
-                }
-            }
-        } else {
-            result
-        }
+        responseToResult(response)
     } catch (e: Exception) {
         when (e) {
             is SocketTimeoutException -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
             is JsonSyntaxException -> Result.Error(DataError.Network.SERVER_ERROR)
             else -> Result.Error(DataError.Network.UNKNOWN)
         }.also { e.printStackTrace() }
-    }
-}
-
-fun shouldRefreshToken(error: DataError): Boolean {
-    return when (error) {
-        DataError.Auth.JWT_TOKEN_EXPIRED,
-        DataError.Auth.JWT_TOKEN_MALFORMED,
-        DataError.Auth.JWT_TOKEN_MISSING,
-        DataError.Auth.JWT_SIGNATURE_INVALID,
-        DataError.Auth.TOKEN_BLACKLISTED,
-        DataError.Auth.ACCESS_TOKEN_INVALID -> true
-
-        DataError.Auth.INVALID_REFRESH_TOKEN -> false // Don't retry for these
-        else -> false
     }
 }
 
