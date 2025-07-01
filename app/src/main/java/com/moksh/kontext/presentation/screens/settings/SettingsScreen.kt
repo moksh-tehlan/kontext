@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.moksh.kontext.BuildConfig
 import com.moksh.kontext.presentation.common.ConfirmationDialog
 import com.moksh.kontext.presentation.common.backArrowIcon
 import com.moksh.kontext.presentation.common.billingIcon
@@ -141,7 +142,7 @@ fun SettingsScreenContent(
                             onPrivacyPolicyClick = { onAction(SettingsActions.OnPrivacyPolicyClick) },
                             onLicensesClick = { onAction(SettingsActions.OnLicensesClick) },
                             onHelpSupportClick = { onAction(SettingsActions.OnHelpSupportClick) },
-                            appVersion = "1.0"
+                            appVersion = BuildConfig.VERSION_NAME
                         )
                     }
                 }

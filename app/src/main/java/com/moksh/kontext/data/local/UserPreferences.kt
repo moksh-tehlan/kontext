@@ -49,8 +49,7 @@ class UserPreferences @Inject constructor(
         val nickname = sharedPreferences.getString(USER_NICKNAME_KEY, null) ?: return null
         val authProvider = sharedPreferences.getString(USER_AUTH_PROVIDER_KEY, null) ?: return null
         val role = sharedPreferences.getString(USER_ROLE_KEY, null) ?: return null
-        val profilePicture =
-            sharedPreferences.getString(USER_PROFILE_PICTURE_URL_KEY, null) ?: return null
+        val profilePicture = sharedPreferences.getString(USER_PROFILE_PICTURE_URL_KEY, null)
 
         return UserDto(
             id = id,
