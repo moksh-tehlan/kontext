@@ -9,16 +9,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -41,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.moksh.kontext.domain.model.KnowledgeSourceDto
 import com.moksh.kontext.domain.model.KnowledgeSourceStatus
 import com.moksh.kontext.domain.model.KnowledgeSourceType
+import com.moksh.kontext.presentation.common.KontextButton
 import com.moksh.kontext.presentation.common.backArrowIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
@@ -53,6 +53,7 @@ import com.moksh.kontext.presentation.screens.knowledge_source.viewmodel.Knowled
 import com.moksh.kontext.presentation.screens.knowledge_source.viewmodel.KnowledgeSourceScreenState
 import com.moksh.kontext.presentation.screens.knowledge_source.viewmodel.KnowledgeSourceViewModel
 import com.moksh.kontext.presentation.screens.knowledge_source.viewmodel.WebUrlDialogState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -131,10 +132,10 @@ fun KnowledgeSourceScreenView(
     addContentBottomSheetState: AddContentBottomSheetState = AddContentBottomSheetState(),
     webUrlDialogState: WebUrlDialogState = WebUrlDialogState(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    bottomSheetState: androidx.compose.material3.SheetState = rememberModalBottomSheetState(
+    bottomSheetState: SheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     ),
-    scope: kotlinx.coroutines.CoroutineScope = rememberCoroutineScope(),
+    scope: CoroutineScope = rememberCoroutineScope(),
     onNavigateBack: () -> Unit = {},
     onAction: (KnowledgeSourceScreenActions) -> Unit = {}
 ) {
@@ -173,20 +174,18 @@ fun KnowledgeSourceScreenView(
                 )
             )
         },
+        floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { onAction(KnowledgeSourceScreenActions.ShowAddContentBottomSheet) },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add Content"
-                    )
+            KontextButton(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                textColor = MaterialTheme.colorScheme.surface,
+                backgroundColor = MaterialTheme.colorScheme.onSurface,
+                text = "Add Content",
+                onClick = {
+                    onAction(KnowledgeSourceScreenActions.ShowAddContentBottomSheet)
                 },
-                text = {
-                    Text("Add Content")
-                },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
             )
         }
     ) { innerPadding ->

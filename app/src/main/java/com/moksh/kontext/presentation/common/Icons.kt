@@ -52,3 +52,11 @@ val deleteIcon: ImageVector
 val openViewIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.open_view_logo)
+
+val documentIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.document_logo)
+
+val webIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.web_logo)

@@ -33,6 +33,7 @@ fun WebUrlDialog(
     modifier: Modifier = Modifier
 ) {
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
         onDismissRequest = onDismiss,
         modifier = modifier,
         properties = DialogProperties(
@@ -42,7 +43,8 @@ fun WebUrlDialog(
         title = {
             Text(
                 text = "Add Web URL",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
         text = {
@@ -52,7 +54,7 @@ fun WebUrlDialog(
                 Text(
                     text = "Enter a web URL to add to your knowledge base",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
 
                 OutlinedTextField(
@@ -88,7 +90,7 @@ fun WebUrlDialog(
                         Text(
                             text = "Adding web URL...",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
                     }
                 }
@@ -107,7 +109,7 @@ fun WebUrlDialog(
                 onClick = onDismiss,
                 enabled = !isLoading
             ) {
-                Text("Cancel")
+                Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     )

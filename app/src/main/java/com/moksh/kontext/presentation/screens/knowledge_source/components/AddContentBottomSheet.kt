@@ -24,8 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.moksh.kontext.presentation.common.documentIcon
+import com.moksh.kontext.presentation.common.webIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,14 +70,14 @@ fun AddContentBottomSheet(
 
             // Upload from device option
             AddContentOption(
-                icon = Icons.Default.ThumbUp,
+                icon = documentIcon,
                 title = "Upload from device",
                 onClick = onUploadFromDevice
             )
 
             // Web URL option
             AddContentOption(
-                icon = Icons.Default.Place,
+                icon = webIcon,
                 title = "Web URL",
                 onClick = onAddWebUrl
             )
@@ -86,7 +89,7 @@ fun AddContentBottomSheet(
 
 @Composable
 fun AddContentOption(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     title: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier

@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.moksh.kontext.domain.model.KnowledgeSourceDto
 import com.moksh.kontext.domain.model.KnowledgeSourceStatus
 import com.moksh.kontext.domain.model.KnowledgeSourceType
+import com.moksh.kontext.presentation.common.documentIcon
+import com.moksh.kontext.presentation.common.webIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
 import com.moksh.kontext.presentation.core.utils.DateUtils
 
@@ -35,10 +35,7 @@ fun KnowledgeSourceItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(8.dp)
-            )
+            .background(color = MaterialTheme.colorScheme.surface)
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -46,12 +43,12 @@ fun KnowledgeSourceItem(
         // Icon based on type
         Icon(
             imageVector = when (knowledgeSource.type) {
-                KnowledgeSourceType.DOCUMENT -> Icons.Default.FavoriteBorder
-                KnowledgeSourceType.WEB -> Icons.Default.FavoriteBorder
+                KnowledgeSourceType.DOCUMENT -> documentIcon
+                KnowledgeSourceType.WEB -> webIcon
             },
             contentDescription = null,
             modifier = Modifier.size(40.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.onSurface
         )
 
         // Content
