@@ -195,6 +195,7 @@ fun ProjectScreenView(
                     ) {
                         ProjectKnowledge(
                             modifier = Modifier.weight(1f),
+                            totalFiles = projectState.knowledgeSourceCount,
                             onClick = {
                                 projectState.projectId?.let { projectId ->
                                     onNavigateToKnowledgeSource(projectId)

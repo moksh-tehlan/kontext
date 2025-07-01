@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moksh.kontext.domain.model.UpdateProjectDto
 import com.moksh.kontext.domain.repository.ChatRepository
+import com.moksh.kontext.domain.repository.KnowledgeSourceRepository
 import com.moksh.kontext.domain.repository.ProjectRepository
 import com.moksh.kontext.domain.utils.Result
 import com.moksh.kontext.presentation.core.utils.asUiText
@@ -27,6 +28,7 @@ class ProjectViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val chatRepository: ChatRepository,
     private val projectRepository: ProjectRepository,
+    private val knowledgeSourceRepository: KnowledgeSourceRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -44,6 +46,7 @@ class ProjectViewModel @Inject constructor(
             // Load project details and chats when screen starts
             loadProjectDetails()
             loadChats()
+            loadKnowledgeSourceCount()
         }
         .stateIn(
             viewModelScope,
@@ -189,6 +192,23 @@ class ProjectViewModel @Inject constructor(
     private fun createNewChat() {
         viewModelScope.launch {
             _projectEvents.emit(ProjectScreenEvents.NavigateToChat(projectId, "new_chat"))
+        }
+    }
+
+    private fun loadKnowledgeSourceCount() {
+        viewModelScope.launch {
+            when (val result = knowledgeSourceRepository.getProjectKnowledgeSources(projectId)) {
+                is Result.Success -> {
+                    _projectState.update {
+                        it.copy(knowledgeSourceCount = result.data.size)
+                    }
+                }
+
+                is Result.Error -> {
+                    // Handle error silently - knowledge source count is not critical
+                    // Keep default count of 0
+                }
+            }
         }
     }
 

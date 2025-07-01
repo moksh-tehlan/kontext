@@ -42,7 +42,7 @@ fun ProjectKnowledge(
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "$totalFiles files",
+            text = "$totalFiles sources",
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.bodySmall.copy(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)

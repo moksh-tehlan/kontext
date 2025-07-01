@@ -8,7 +8,8 @@ data class ProjectScreenState(
     val errorMessage: String? = null,
     val projectId: String? = null,
     val projectName: String = "Project Name",
-    val agentInstruction: String? = null
+    val agentInstruction: String? = null,
+    val knowledgeSourceCount: Int = 0
 )
 
 data class CustomInstructionDialogState(
