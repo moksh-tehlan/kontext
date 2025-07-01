@@ -136,7 +136,6 @@ class ProjectViewModel @Inject constructor(
             is ProjectScreenActions.HideChatOptionsMenu -> {
                 _projectState.update {
                     it.copy(
-                        selectedChatId = null,
                         showChatOptionsMenu = false
                     )
                 }
