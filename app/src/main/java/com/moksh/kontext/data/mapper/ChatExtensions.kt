@@ -1,14 +1,18 @@
 package com.moksh.kontext.data.mapper
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.moksh.kontext.data.model.chat.Chat
 import com.moksh.kontext.data.model.chat.ChatMessage
 import com.moksh.kontext.data.model.chat.CreateChatRequest
 import com.moksh.kontext.data.model.chat.SendMessageRequest
+import com.moksh.kontext.data.model.chat.UpdateChatRequest
 import com.moksh.kontext.domain.model.ChatDto
 import com.moksh.kontext.domain.model.ChatMessageDto
 import com.moksh.kontext.domain.model.CreateChatDto
 import com.moksh.kontext.domain.model.MessageType
 import com.moksh.kontext.domain.model.SendMessageDto
+import com.moksh.kontext.domain.model.UpdateChatDto
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -24,6 +28,7 @@ fun Chat.toDto(): ChatDto {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun ChatMessage.toDto(): ChatMessageDto {
     return ChatMessageDto(
         id = UUID.fromString(id),
@@ -47,6 +52,12 @@ fun CreateChatDto.toRequest(): CreateChatRequest {
     return CreateChatRequest(
         name = name,
         projectId = projectId
+    )
+}
+
+fun UpdateChatDto.toRequest(): UpdateChatRequest {
+    return UpdateChatRequest(
+        name = name
     )
 }
 

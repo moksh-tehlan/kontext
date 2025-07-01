@@ -6,4 +6,8 @@ sealed class ProjectScreenEvents {
     data object ChatsLoadedSuccessfully : ProjectScreenEvents()
     data object CustomInstructionSavedSuccessfully : ProjectScreenEvents()
     data object CloseCustomInstructionDialog : ProjectScreenEvents()
+
+    // Chat operations events
+    data object ChatRenamedSuccessfully : ProjectScreenEvents()
+    data object ChatDeletedSuccessfully : ProjectScreenEvents()
 }

@@ -15,6 +15,11 @@ data class SendMessageRequest(
     val query: String
 )
 
+data class UpdateChatRequest(
+    @SerializedName("name")
+    val name: String
+)
+
 // Response models
 data class Chat(
     @SerializedName("id")

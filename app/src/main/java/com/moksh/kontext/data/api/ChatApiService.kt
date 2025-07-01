@@ -5,10 +5,13 @@ import com.moksh.kontext.data.model.chat.Chat
 import com.moksh.kontext.data.model.chat.ChatMessage
 import com.moksh.kontext.data.model.chat.CreateChatRequest
 import com.moksh.kontext.data.model.chat.SendMessageRequest
+import com.moksh.kontext.data.model.chat.UpdateChatRequest
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ChatApiService {
@@ -27,4 +30,13 @@ interface ChatApiService {
 
     @GET("api/v1/chats/project/{projectId}")
     suspend fun getProjectChats(@Path("projectId") projectId: String): Response<ApiResponse<List<Chat>>>
+
+    @PUT("api/v1/chats/{chatId}")
+    suspend fun updateChat(
+        @Path("chatId") chatId: String,
+        @Body request: UpdateChatRequest
+    ): Response<ApiResponse<Chat>>
+
+    @DELETE("api/v1/chats/{chatId}")
+    suspend fun deleteChat(@Path("chatId") chatId: String): Response<ApiResponse<Unit>>
 }

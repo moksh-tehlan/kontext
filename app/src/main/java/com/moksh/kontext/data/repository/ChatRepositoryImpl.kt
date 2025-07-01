@@ -8,6 +8,7 @@ import com.moksh.kontext.domain.model.ChatDto
 import com.moksh.kontext.domain.model.ChatMessageDto
 import com.moksh.kontext.domain.model.CreateChatDto
 import com.moksh.kontext.domain.model.SendMessageDto
+import com.moksh.kontext.domain.model.UpdateChatDto
 import com.moksh.kontext.domain.repository.ChatRepository
 import com.moksh.kontext.domain.utils.DataError
 import com.moksh.kontext.domain.utils.Result
@@ -71,6 +72,30 @@ class ChatRepositoryImpl @Inject constructor(
                 } ?: Result.Error(DataError.Network.EMPTY_RESPONSE)
             }
 
+            is Result.Error -> result
+        }
+    }
+
+    override suspend fun updateChat(
+        chatId: String,
+        updateChatDto: UpdateChatDto
+    ): Result<ChatDto, DataError> {
+        return when (val result = safeCall {
+            chatApiService.updateChat(chatId, updateChatDto.toRequest())
+        }) {
+            is Result.Success -> {
+                result.data.data?.let { chat ->
+                    Result.Success(chat.toDto())
+                } ?: Result.Error(DataError.Network.EMPTY_RESPONSE)
+            }
+
+            is Result.Error -> result
+        }
+    }
+
+    override suspend fun deleteChat(chatId: String): Result<Unit, DataError> {
+        return when (val result = safeCall { chatApiService.deleteChat(chatId) }) {
+            is Result.Success -> Result.Success(Unit)
             is Result.Error -> result
         }
     }

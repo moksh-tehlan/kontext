@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moksh.kontext.domain.model.UpdateChatDto
 import com.moksh.kontext.domain.model.UpdateProjectDto
 import com.moksh.kontext.domain.repository.ChatRepository
 import com.moksh.kontext.domain.repository.KnowledgeSourceRepository
@@ -120,6 +121,84 @@ class ProjectViewModel @Inject constructor(
 
             is ProjectScreenActions.SaveCustomInstruction -> {
                 saveCustomInstruction()
+            }
+
+            // Chat operations
+            is ProjectScreenActions.ShowChatOptionsMenu -> {
+                _projectState.update {
+                    it.copy(
+                        selectedChatId = action.chatId,
+                        showChatOptionsMenu = true
+                    )
+                }
+            }
+
+            is ProjectScreenActions.HideChatOptionsMenu -> {
+                _projectState.update {
+                    it.copy(
+                        selectedChatId = null,
+                        showChatOptionsMenu = false
+                    )
+                }
+            }
+
+            is ProjectScreenActions.ShowRenameChatDialog -> {
+                _projectState.update {
+                    it.copy(
+                        selectedChatId = action.chatId,
+                        showChatOptionsMenu = false,
+                        showRenameChatDialog = true,
+                        renameChatName = action.currentName
+                    )
+                }
+            }
+
+            is ProjectScreenActions.HideRenameChatDialog -> {
+                _projectState.update {
+                    it.copy(
+                        selectedChatId = null,
+                        showRenameChatDialog = false,
+                        renameChatName = "",
+                        isRenamingChat = false
+                    )
+                }
+            }
+
+            is ProjectScreenActions.RenameChatNameChange -> {
+                _projectState.update {
+                    it.copy(renameChatName = action.name)
+                }
+            }
+
+            is ProjectScreenActions.ConfirmRenameChat -> {
+                renameChat()
+            }
+
+            is ProjectScreenActions.ShowDeleteChatDialog -> {
+                _projectState.update {
+                    it.copy(
+                        showChatOptionsMenu = false,
+                        showDeleteChatDialog = true,
+                        deleteChatInfo = DeleteChatInfo(
+                            chatId = action.chatId,
+                            chatName = action.chatName
+                        )
+                    )
+                }
+            }
+
+            is ProjectScreenActions.HideDeleteChatDialog -> {
+                _projectState.update {
+                    it.copy(
+                        showDeleteChatDialog = false,
+                        deleteChatInfo = null,
+                        isDeletingChat = false
+                    )
+                }
+            }
+
+            is ProjectScreenActions.ConfirmDeleteChat -> {
+                deleteChat(action.chatId)
             }
         }
     }
@@ -258,6 +337,88 @@ class ProjectViewModel @Inject constructor(
                         )
                     }
                     _projectEvents.emit(ProjectScreenEvents.ShowError(errorMessage))
+                }
+            }
+        }
+    }
+
+    private fun renameChat() {
+        viewModelScope.launch {
+            val currentState = _projectState.value
+            val chatId = currentState.selectedChatId ?: return@launch
+            val newName = currentState.renameChatName.trim()
+
+            if (newName.isBlank()) {
+                _projectEvents.emit(ProjectScreenEvents.ShowError("Chat name cannot be empty"))
+                return@launch
+            }
+
+            _projectState.update {
+                it.copy(isRenamingChat = true)
+            }
+
+            when (val result = chatRepository.updateChat(chatId, UpdateChatDto(name = newName))) {
+                is Result.Success -> {
+                    // Update the chat in the local list
+                    _projectState.update { state ->
+                        state.copy(
+                            isRenamingChat = false,
+                            showRenameChatDialog = false,
+                            selectedChatId = null,
+                            renameChatName = "",
+                            chats = state.chats.map { chat ->
+                                if (chat.id == chatId) {
+                                    chat.copy(name = newName)
+                                } else {
+                                    chat
+                                }
+                            }
+                        )
+                    }
+
+                    _projectEvents.emit(ProjectScreenEvents.ChatRenamedSuccessfully)
+                }
+
+                is Result.Error -> {
+                    _projectState.update {
+                        it.copy(isRenamingChat = false)
+                    }
+
+                    val errorMessage = result.error.asUiText().asString(context)
+                    _projectEvents.emit(ProjectScreenEvents.ShowError("Failed to rename chat: $errorMessage"))
+                }
+            }
+        }
+    }
+
+    private fun deleteChat(chatId: String) {
+        viewModelScope.launch {
+            _projectState.update {
+                it.copy(isDeletingChat = true)
+            }
+
+            when (val result = chatRepository.deleteChat(chatId)) {
+                is Result.Success -> {
+                    // Remove the chat from the local list
+                    _projectState.update { state ->
+                        state.copy(
+                            isDeletingChat = false,
+                            showDeleteChatDialog = false,
+                            deleteChatInfo = null,
+                            chats = state.chats.filter { it.id != chatId }
+                        )
+                    }
+
+                    _projectEvents.emit(ProjectScreenEvents.ChatDeletedSuccessfully)
+                }
+
+                is Result.Error -> {
+                    _projectState.update {
+                        it.copy(isDeletingChat = false)
+                    }
+
+                    val errorMessage = result.error.asUiText().asString(context)
+                    _projectEvents.emit(ProjectScreenEvents.ShowError("Failed to delete chat: $errorMessage"))
                 }
             }
         }

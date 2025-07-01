@@ -14,6 +14,10 @@ data class CreateChatDto(
     val projectId: String
 )
 
+data class UpdateChatDto(
+    val name: String
+)
+
 data class SendMessageDto(
     val query: String
 )

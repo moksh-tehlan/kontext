@@ -39,14 +39,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.moksh.kontext.presentation.common.ConfirmationDialog
 import com.moksh.kontext.presentation.common.backArrowIcon
+import com.moksh.kontext.presentation.common.deleteIcon
 import com.moksh.kontext.presentation.core.theme.KontextTheme
 import com.moksh.kontext.presentation.core.utils.DateUtils
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
-import com.moksh.kontext.presentation.screens.home.components.ProjectItem
+import com.moksh.kontext.presentation.screens.project.components.ChatItem
 import com.moksh.kontext.presentation.screens.project.components.CustomInstruction
 import com.moksh.kontext.presentation.screens.project.components.CustomInstructionDialog
 import com.moksh.kontext.presentation.screens.project.components.ProjectKnowledge
+import com.moksh.kontext.presentation.screens.project.components.RenameChatDialog
 import com.moksh.kontext.presentation.screens.project.viewmodel.ProjectScreenActions
 import com.moksh.kontext.presentation.screens.project.viewmodel.ProjectScreenEvents
 import com.moksh.kontext.presentation.screens.project.viewmodel.ProjectViewModel
@@ -91,6 +94,18 @@ fun ProjectScreen(
             is ProjectScreenEvents.CloseCustomInstructionDialog -> {
                 scope.launch {
                     bottomSheetState.hide()
+                }
+            }
+
+            is ProjectScreenEvents.ChatRenamedSuccessfully -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Chat renamed successfully!")
+                }
+            }
+
+            is ProjectScreenEvents.ChatDeletedSuccessfully -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Chat deleted successfully!")
                 }
             }
         }
@@ -237,11 +252,34 @@ fun ProjectScreenView(
                     }
                 } else {
                     items(projectState.chats) { chat ->
-                        ProjectItem(
-                            projectName = chat.name,
+                        ChatItem(
+                            chatName = chat.name,
                             date = DateUtils.formatDateString(chat.updatedAt),
+                            showOptionsMenu = projectState.showChatOptionsMenu && projectState.selectedChatId == chat.id,
                             onClick = {
                                 onAction(ProjectScreenActions.NavigateToChat(chat.id))
+                            },
+                            onLongClick = {
+                                onAction(ProjectScreenActions.ShowChatOptionsMenu(chat.id))
+                            },
+                            onRenameClick = {
+                                onAction(
+                                    ProjectScreenActions.ShowRenameChatDialog(
+                                        chat.id,
+                                        chat.name
+                                    )
+                                )
+                            },
+                            onDeleteClick = {
+                                onAction(
+                                    ProjectScreenActions.ShowDeleteChatDialog(
+                                        chat.id,
+                                        chat.name
+                                    )
+                                )
+                            },
+                            onDismissOptionsMenu = {
+                                onAction(ProjectScreenActions.HideChatOptionsMenu)
                             }
                         )
                     }
@@ -293,6 +331,32 @@ fun ProjectScreenView(
             instruction = customInstructionDialogState.instruction,
             onInstructionChange = { onAction(ProjectScreenActions.InstructionChange(it)) },
             onSaveInstruction = { onAction(ProjectScreenActions.SaveCustomInstruction) }
+        )
+    }
+
+    // Rename Chat Dialog
+    RenameChatDialog(
+        isVisible = projectState.showRenameChatDialog,
+        chatName = projectState.renameChatName,
+        onNameChange = { onAction(ProjectScreenActions.RenameChatNameChange(it)) },
+        onConfirm = { onAction(ProjectScreenActions.ConfirmRenameChat) },
+        onCancel = { onAction(ProjectScreenActions.HideRenameChatDialog) },
+        isLoading = projectState.isRenamingChat
+    )
+
+    // Delete Chat Confirmation Dialog
+    projectState.deleteChatInfo?.let { deleteChatInfo ->
+        ConfirmationDialog(
+            isVisible = projectState.showDeleteChatDialog,
+            title = "Delete Chat",
+            message = "Are you sure you want to delete \"${deleteChatInfo.chatName}\"? This action cannot be undone and all messages will be permanently removed.",
+            confirmText = "Delete Chat",
+            cancelText = "Cancel",
+            icon = deleteIcon,
+            isDestructive = true,
+            isLoading = projectState.isDeletingChat,
+            onConfirm = { onAction(ProjectScreenActions.ConfirmDeleteChat(deleteChatInfo.chatId)) },
+            onCancel = { onAction(ProjectScreenActions.HideDeleteChatDialog) }
         )
     }
 }
