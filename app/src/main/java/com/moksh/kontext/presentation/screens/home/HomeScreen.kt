@@ -1,5 +1,6 @@
 package com.moksh.kontext.presentation.screens.home
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -28,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +42,7 @@ import com.moksh.kontext.presentation.core.theme.KontextTheme
 import com.moksh.kontext.presentation.core.utils.DateUtils
 import com.moksh.kontext.presentation.core.utils.ObserveAsEvents
 import com.moksh.kontext.presentation.screens.home.components.CreateProjectBottomSheet
+import com.moksh.kontext.presentation.screens.home.components.HomeEmptyState
 import com.moksh.kontext.presentation.screens.home.components.ProjectItem
 import com.moksh.kontext.presentation.screens.home.viewmodel.CreateProjectBottomSheetState
 import com.moksh.kontext.presentation.screens.home.viewmodel.HomeScreenActions
@@ -81,6 +85,7 @@ fun HomeScreen(
                     bottomSheetState.hide()
                 }
             }
+
             is HomeScreenEvents.NavigateToProject -> {
                 navigateToProject(event.projectId)
             }
@@ -168,21 +173,45 @@ fun HomeScreenView(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 14.dp),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                thickness = 0.5.dp
-            )
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(state.projects) { project ->
-                    ProjectItem(
-                        projectName = project.name,
-                        date = DateUtils.formatDateString(project.updatedAt),
-                        onClick = {
-                            action(HomeScreenActions.OnProjectClick(project.id))
-                        }
+            when {
+                state.isLoading -> {
+                    // Show loading indicator when projects are being loaded
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                state.projects.isEmpty() -> {
+                    // Show empty state when no projects are available
+                    HomeEmptyState(
+                        modifier = Modifier.fillMaxSize()
                     )
+                }
+
+                else -> {
+                    // Show projects list when projects are available
+                    Spacer(modifier = Modifier.height(10.dp))
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 14.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        thickness = 0.5.dp
+                    )
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(state.projects) { project ->
+                            ProjectItem(
+                                projectName = project.name,
+                                date = DateUtils.formatDateString(project.updatedAt),
+                                onClick = {
+                                    action(HomeScreenActions.OnProjectClick(project.id))
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

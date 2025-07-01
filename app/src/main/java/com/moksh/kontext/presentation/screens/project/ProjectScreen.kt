@@ -234,23 +234,7 @@ fun ProjectScreenView(
                     )
                 }
 
-                if (projectState.chats.isEmpty() && !projectState.isLoading) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(32.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "No chats yet. Create your first chat!",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                } else {
+                if (projectState.chats.isNotEmpty()) {
                     items(projectState.chats) { chat ->
                         ChatItem(
                             chatName = chat.name,
@@ -283,6 +267,24 @@ fun ProjectScreenView(
                             }
                         )
                     }
+                }
+            }
+
+            // Centered empty state for chats
+            if (projectState.chats.isEmpty() && !projectState.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 140.dp), // Account for the ProjectKnowledge and CustomInstruction sections
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Chat's you've had with Kontext will show up here.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 32.dp)
+                    )
                 }
             }
 
