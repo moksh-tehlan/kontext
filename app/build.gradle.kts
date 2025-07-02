@@ -8,6 +8,13 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
 }
+val versionProps = Properties().apply {
+    load(File(rootDir, "version.properties").inputStream())
+}
+
+val major = versionProps["MAJOR"].toString().toInt()
+val minor = versionProps["MINOR"].toString().toInt()
+val patch = versionProps["PATCH"].toString().toInt()
 
 // Load environment variables from .env files
 fun loadEnvFile(fileName: String): Properties {
@@ -30,8 +37,8 @@ android {
         applicationId = "com.moksh.kontext"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = major * 10000 + minor * 100 + patch
+        versionName = "$major.$minor.$patch"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

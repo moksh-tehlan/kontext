@@ -1,5 +1,11 @@
 package com.moksh.kontext.presentation.screens.knowledge_source
 
+import android.content.ContentResolver
+import android.database.Cursor
+import android.net.Uri
+import android.provider.OpenableColumns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,9 +74,43 @@ fun KnowledgeSourceScreen(
     val webUrlDialogState by viewModel.webUrlDialogState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+
+    // File picker launcher for PDF and TXT files
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { selectedUri ->
+            try {
+                val contentResolver = context.contentResolver
+                val mimeType = contentResolver.getType(selectedUri)
+
+                // Validate file type (PDF or TXT)
+                if (mimeType == "application/pdf" || mimeType == "text/plain") {
+                    // Convert URI to File and upload
+                    contentResolver.openInputStream(selectedUri)?.use { inputStream ->
+                        val fileName = getFileName(contentResolver, selectedUri) ?: "uploaded_file"
+                        val tempFile = java.io.File(context.cacheDir, fileName)
+                        tempFile.outputStream().use { outputStream ->
+                            inputStream.copyTo(outputStream)
+                        }
+                        viewModel.onAction(KnowledgeSourceScreenActions.UploadFile(tempFile))
+                    }
+                } else {
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Please select a PDF or TXT file")
+                    }
+                }
+            } catch (e: Exception) {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Error reading file: ${e.message}")
+                }
+            }
+        }
+    }
 
     ObserveAsEvents(flow = viewModel.knowledgeSourceEvents) { event ->
         when (event) {
@@ -104,11 +145,8 @@ fun KnowledgeSourceScreen(
             }
 
             is KnowledgeSourceScreenEvents.OpenFilePicker -> {
-                // Handle file picker opening
-                // This would typically be handled by the activity
-                scope.launch {
-                    snackbarHostState.showSnackbar("File picker functionality would be implemented here")
-                }
+                // Launch file picker with PDF and TXT filter
+                filePickerLauncher.launch("*/*")
             }
         }
     }
@@ -330,4 +368,19 @@ fun KnowledgeSourceScreenViewPreview() {
             )
         )
     }
+}
+
+// Helper function to get file name from URI
+private fun getFileName(contentResolver: ContentResolver, uri: Uri): String? {
+    var fileName: String? = null
+    val cursor: Cursor? = contentResolver.query(uri, null, null, null, null)
+    cursor?.use {
+        if (it.moveToFirst()) {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1) {
+                fileName = it.getString(nameIndex)
+            }
+        }
+    }
+    return fileName
 } 

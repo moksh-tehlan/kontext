@@ -72,6 +72,7 @@ fun AddContentBottomSheet(
             AddContentOption(
                 icon = documentIcon,
                 title = "Upload from device",
+                subtitle = "PDF and TXT files only",
                 onClick = onUploadFromDevice
             )
 
@@ -92,7 +93,8 @@ fun AddContentOption(
     icon: ImageVector,
     title: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subtitle: String? = null
 ) {
     Row(
         modifier = modifier
@@ -111,11 +113,20 @@ fun AddContentOption(
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Column {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            subtitle?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                )
+            }
+        }
     }
 }
 
