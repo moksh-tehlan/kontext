@@ -56,7 +56,13 @@ class KnowledgeSourceRepositoryImpl @Inject constructor(
         file: File
     ): Result<KnowledgeSourceDto, DataError> {
         return when (val result = safeCall {
-            val requestFile = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
+            // Determine MIME type based on file extension
+            val mimeType = when (file.extension.lowercase()) {
+                "pdf" -> "application/pdf"
+                "txt" -> "text/plain"
+                else -> "application/octet-stream"
+            }
+            val requestFile = file.asRequestBody(mimeType.toMediaTypeOrNull())
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
             knowledgeSourceApiService.uploadFile(projectId, body)
         }) {

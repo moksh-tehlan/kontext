@@ -21,6 +21,8 @@ interface ChatRepository {
 
     suspend fun getProjectChats(projectId: String): Result<List<ChatDto>, DataError>
 
+    suspend fun getChatById(chatId: String, projectId: String): Result<ChatDto?, DataError>
+
     suspend fun updateChat(chatId: String, updateChatDto: UpdateChatDto): Result<ChatDto, DataError>
 
     suspend fun deleteChat(chatId: String): Result<Unit, DataError>

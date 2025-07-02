@@ -92,7 +92,7 @@ fun ChatScreenView(
                 title = {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Chat Name here",
+                        text = chatState.chatName ?: "Chat",
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface

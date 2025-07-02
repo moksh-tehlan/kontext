@@ -84,6 +84,7 @@ class ChatViewModel @Inject constructor(
 
     private fun initializeChat() {
         if (chatId != null && chatId != "new_chat") {
+            loadChatDetails()
             loadMessages()
         } else {
             // Create new chat
@@ -237,7 +238,8 @@ class ChatViewModel @Inject constructor(
                     _chatState.update {
                         it.copy(
                             isLoading = false,
-                            chatId = result.data.id
+                            chatId = result.data.id,
+                            chatName = result.data.name
                         )
                     }
                 }
@@ -257,6 +259,32 @@ class ChatViewModel @Inject constructor(
                         )
                     }
                     _chatEvents.emit(ChatScreenEvents.ShowError(errorMessage))
+                }
+            }
+        }
+    }
+
+    private fun loadChatDetails() {
+        viewModelScope.launch {
+            val currentState = _chatState.value
+
+            if (currentState.chatId == null || currentState.projectId == null) {
+                return@launch
+            }
+
+            when (val result =
+                chatRepository.getChatById(currentState.chatId, currentState.projectId)) {
+                is Result.Success -> {
+                    result.data?.let { chat ->
+                        _chatState.update {
+                            it.copy(chatName = chat.name)
+                        }
+                    }
+                }
+
+                is Result.Error -> {
+                    // If we can't load chat details, we'll just use a default name
+                    // This shouldn't block the chat functionality
                 }
             }
         }

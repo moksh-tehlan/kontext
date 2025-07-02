@@ -135,9 +135,7 @@ fun KnowledgeSourceScreen(
             }
 
             is KnowledgeSourceScreenEvents.CloseAddContentBottomSheet -> {
-                scope.launch {
-                    bottomSheetState.hide()
-                }
+                // No longer needed - bottom sheet hides immediately when file is picked
             }
 
             is KnowledgeSourceScreenEvents.CloseWebUrlDialog -> {
@@ -221,6 +219,7 @@ fun KnowledgeSourceScreenView(
                 textColor = MaterialTheme.colorScheme.surface,
                 backgroundColor = MaterialTheme.colorScheme.onSurface,
                 text = "Add Content",
+                isLoading = addContentBottomSheetState.isLoading,
                 onClick = {
                     onAction(KnowledgeSourceScreenActions.ShowAddContentBottomSheet)
                 },
@@ -273,8 +272,8 @@ fun KnowledgeSourceScreenView(
                 }
             }
 
-            // Loading indicator
-            if (knowledgeSourceState.isLoading) {
+            // Loading indicator (only for initial loading)
+            if (knowledgeSourceState.isLoading && knowledgeSourceState.knowledgeSources.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center

@@ -10,5 +10,6 @@ data class ChatScreenState(
     val errorMessage: String? = null,
     val chatId: String? = null,
     val projectId: String? = null,
-    val userNickname: String = "You"
+    val userNickname: String = "You",
+    val chatName: String? = null
 )

@@ -91,6 +91,10 @@ class KnowledgeSourceViewModel @Inject constructor(
             }
 
             is KnowledgeSourceScreenActions.UploadFile -> {
+                // Hide bottom sheet immediately and start upload with loading on button
+                _addContentBottomSheetState.update {
+                    it.copy(isVisible = false, isLoading = true)
+                }
                 uploadFile(action.file)
             }
 
@@ -113,6 +117,10 @@ class KnowledgeSourceViewModel @Inject constructor(
             }
 
             is KnowledgeSourceScreenActions.AddWebUrl -> {
+                // Hide dialog immediately and start web URL addition with loading on button
+                _webUrlDialogState.update {
+                    it.copy(isVisible = false, isLoading = true)
+                }
                 addWebUrl()
             }
 
@@ -162,20 +170,24 @@ class KnowledgeSourceViewModel @Inject constructor(
 
             if (url.isBlank()) {
                 _webUrlDialogState.update {
-                    it.copy(errorMessage = "Please enter a valid URL")
+                    it.copy(
+                        isLoading = false,
+                        isVisible = true,
+                        errorMessage = "Please enter a valid URL"
+                    )
                 }
                 return@launch
             }
 
             if (!isValidUrl(url)) {
                 _webUrlDialogState.update {
-                    it.copy(errorMessage = "Please enter a valid URL")
+                    it.copy(
+                        isLoading = false,
+                        isVisible = true,
+                        errorMessage = "Please enter a valid URL"
+                    )
                 }
                 return@launch
-            }
-
-            _webUrlDialogState.update {
-                it.copy(isLoading = true, errorMessage = null)
             }
 
             when (val result = knowledgeSourceRepository.createWebKnowledgeSource(projectId, url)) {
@@ -184,7 +196,6 @@ class KnowledgeSourceViewModel @Inject constructor(
                         it.copy(isLoading = false, url = "")
                     }
                     _knowledgeSourceEvents.emit(KnowledgeSourceScreenEvents.KnowledgeSourceAddedSuccessfully)
-                    _knowledgeSourceEvents.emit(KnowledgeSourceScreenEvents.CloseWebUrlDialog)
                     loadKnowledgeSources() // Refresh the list
                 }
 
@@ -192,6 +203,7 @@ class KnowledgeSourceViewModel @Inject constructor(
                     _webUrlDialogState.update {
                         it.copy(
                             isLoading = false,
+                            isVisible = true,
                             errorMessage = result.error.asUiText().asString(context)
                         )
                     }
@@ -202,26 +214,23 @@ class KnowledgeSourceViewModel @Inject constructor(
 
     private fun uploadFile(file: File) {
         viewModelScope.launch {
+            // Clear any previous errors
             _knowledgeSourceState.update {
-                it.copy(isLoading = true, errorMessage = null)
+                it.copy(errorMessage = null)
             }
 
             when (val result = knowledgeSourceRepository.uploadFile(projectId, file)) {
                 is Result.Success -> {
-                    _knowledgeSourceState.update {
+                    _addContentBottomSheetState.update {
                         it.copy(isLoading = false)
                     }
                     _knowledgeSourceEvents.emit(KnowledgeSourceScreenEvents.KnowledgeSourceAddedSuccessfully)
-                    _knowledgeSourceEvents.emit(KnowledgeSourceScreenEvents.CloseAddContentBottomSheet)
                     loadKnowledgeSources() // Refresh the list
                 }
 
                 is Result.Error -> {
-                    _knowledgeSourceState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = result.error.asUiText().asString(context)
-                        )
+                    _addContentBottomSheetState.update {
+                        it.copy(isLoading = false)
                     }
                     _knowledgeSourceEvents.emit(
                         KnowledgeSourceScreenEvents.ShowError(

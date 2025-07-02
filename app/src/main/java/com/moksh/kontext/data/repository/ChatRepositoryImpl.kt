@@ -76,6 +76,20 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getChatById(
+        chatId: String,
+        projectId: String
+    ): Result<ChatDto?, DataError> {
+        return when (val result = getProjectChats(projectId)) {
+            is Result.Success -> {
+                val chat = result.data.find { it.id == chatId }
+                Result.Success(chat)
+            }
+
+            is Result.Error -> result
+        }
+    }
+
     override suspend fun updateChat(
         chatId: String,
         updateChatDto: UpdateChatDto
