@@ -15,9 +15,7 @@ sealed interface SettingsActions {
     data object ConfirmLogout : SettingsActions
     data object DismissLogoutDialog : SettingsActions
     data object OnConsumerTermsClick : SettingsActions
-    data object OnAcceptableUserPolicyClick : SettingsActions
     data object OnPrivacyPolicyClick : SettingsActions
-    data object OnLicensesClick : SettingsActions
     data object OnHelpSupportClick : SettingsActions
     data object ClearError : SettingsActions
 }

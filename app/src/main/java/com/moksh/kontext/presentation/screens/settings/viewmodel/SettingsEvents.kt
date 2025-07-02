@@ -12,4 +12,5 @@ sealed interface SettingsEvents {
     data class ShowError(val message: String) : SettingsEvents
     data class ShowSuccess(val message: String) : SettingsEvents
     data class ShowInfo(val message: String) : SettingsEvents
+    data class OpenExternalLink(val url: String) : SettingsEvents
 }

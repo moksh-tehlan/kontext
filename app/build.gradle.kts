@@ -109,6 +109,21 @@ android {
                 "GCP_CLIENT_ID",
                 "\"${devEnv.getProperty("GCP_CLIENT_ID") ?: ""}\""
             )
+            buildConfigField(
+                "String",
+                "CONTACT_URL",
+                "\"${devEnv.getProperty("CONTACT_URL") ?: ""}\""
+            )
+            buildConfigField(
+                "String",
+                "TERMS_URL",
+                "\"${devEnv.getProperty("TERMS_URL") ?: ""}\""
+            )
+            buildConfigField(
+                "String",
+                "PRIVACY_URL",
+                "\"${devEnv.getProperty("PRIVACY_URL") ?: ""}\""
+            )
         }
         release {
             signingConfig = signingConfigs.getByName("production")
@@ -138,6 +153,21 @@ android {
                 "String",
                 "GCP_CLIENT_ID",
                 "\"${prodEnv.getProperty("GCP_CLIENT_ID") ?: ""}\""
+            )
+            buildConfigField(
+                "String",
+                "CONTACT_URL",
+                "\"${prodEnv.getProperty("CONTACT_URL") ?: ""}\""
+            )
+            buildConfigField(
+                "String",
+                "TERMS_URL",
+                "\"${prodEnv.getProperty("TERMS_URL") ?: ""}\""
+            )
+            buildConfigField(
+                "String",
+                "PRIVACY_URL",
+                "\"${prodEnv.getProperty("PRIVACY_URL") ?: ""}\""
             )
         }
     }

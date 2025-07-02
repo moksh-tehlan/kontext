@@ -3,6 +3,7 @@ package com.moksh.kontext.presentation.screens.settings.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moksh.kontext.BuildConfig
 import com.moksh.kontext.domain.repository.AuthRepository
 import com.moksh.kontext.domain.repository.UserRepository
 import com.moksh.kontext.domain.utils.DataError
@@ -57,31 +58,19 @@ class SettingsViewModel @Inject constructor(
 
             is SettingsActions.OnConsumerTermsClick -> {
                 viewModelScope.launch {
-                    _events.emit(SettingsEvents.ShowInfo("Consumer Terms - Open external link"))
-                }
-            }
-
-            is SettingsActions.OnAcceptableUserPolicyClick -> {
-                viewModelScope.launch {
-                    _events.emit(SettingsEvents.ShowInfo("Acceptable User Policy - Open external link"))
+                    _events.emit(SettingsEvents.OpenExternalLink(BuildConfig.TERMS_URL))
                 }
             }
 
             is SettingsActions.OnPrivacyPolicyClick -> {
                 viewModelScope.launch {
-                    _events.emit(SettingsEvents.ShowInfo("Privacy Policy - Open external link"))
-                }
-            }
-
-            is SettingsActions.OnLicensesClick -> {
-                viewModelScope.launch {
-                    _events.emit(SettingsEvents.ShowInfo("Licenses - Open external link"))
+                    _events.emit(SettingsEvents.OpenExternalLink(BuildConfig.PRIVACY_URL))
                 }
             }
 
             is SettingsActions.OnHelpSupportClick -> {
                 viewModelScope.launch {
-                    _events.emit(SettingsEvents.ShowInfo("Help & Support - Open external link"))
+                    _events.emit(SettingsEvents.OpenExternalLink(BuildConfig.CONTACT_URL))
                 }
             }
 

@@ -21,9 +21,7 @@ fun InfoDropdownMenu(
     expanded: Boolean,
     onDismiss: () -> Unit,
     onConsumerTermsClick: () -> Unit = {},
-    onAcceptableUserPolicyClick: () -> Unit = {},
     onPrivacyPolicyClick: () -> Unit = {},
-    onLicensesClick: () -> Unit = {},
     onHelpSupportClick: () -> Unit = {},
     appVersion: String = "1.0"
 ) {
@@ -57,29 +55,6 @@ fun InfoDropdownMenu(
             }
         )
 
-        // Acceptable User Policy
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = "Acceptable User Policy",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            },
-            onClick = {
-                onAcceptableUserPolicyClick()
-                onDismiss()
-            },
-            trailingIcon = {
-                Icon(
-                    modifier = Modifier.size(20.dp),
-                    imageVector = openViewIcon,
-                    contentDescription = "Open Acceptable User Policy",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        )
-
         // Privacy Policy
         DropdownMenuItem(
             text = {
@@ -98,29 +73,6 @@ fun InfoDropdownMenu(
                     modifier = Modifier.size(20.dp),
                     imageVector = openViewIcon,
                     contentDescription = "Open Privacy Policy",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        )
-
-        // Licenses
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = "Licenses",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            },
-            onClick = {
-                onLicensesClick()
-                onDismiss()
-            },
-            trailingIcon = {
-                Icon(
-                    modifier = Modifier.size(20.dp),
-                    imageVector = openViewIcon,
-                    contentDescription = "Open Licenses",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
