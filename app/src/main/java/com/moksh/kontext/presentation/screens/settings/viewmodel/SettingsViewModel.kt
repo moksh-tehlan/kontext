@@ -80,17 +80,21 @@ class SettingsViewModel @Inject constructor(
                 }
             }
 
+            /*
             is SettingsActions.NavigateToBilling -> {
                 viewModelScope.launch {
                     _events.emit(SettingsEvents.NavigateToBilling)
                 }
             }
+            */
 
+            /*
             is SettingsActions.NavigateToUpgrade -> {
                 viewModelScope.launch {
                     _events.emit(SettingsEvents.NavigateToUpgrade)
                 }
             }
+            */
 
             is SettingsActions.ToggleHapticFeedback -> {
                 toggleHapticFeedback()
@@ -123,7 +127,7 @@ class SettingsViewModel @Inject constructor(
                     val user = result.data
                     _state.value = _state.value.copy(
                         userEmail = user.email,
-                        userTier = "Free", // TODO: Get actual tier from user data
+                        // userTier = "Free", // TODO: Get actual tier from user data
                         isHapticFeedbackEnabled = true, // TODO: Load from preferences
                         isLoading = false
                     )

@@ -32,7 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.moksh.kontext.BuildConfig
 import com.moksh.kontext.presentation.common.ConfirmationDialog
 import com.moksh.kontext.presentation.common.backArrowIcon
-import com.moksh.kontext.presentation.common.billingIcon
+// import com.moksh.kontext.presentation.common.billingIcon
 import com.moksh.kontext.presentation.common.hapticFeedback
 import com.moksh.kontext.presentation.common.infoIcon
 import com.moksh.kontext.presentation.common.logoutIcon
@@ -43,7 +43,7 @@ import com.moksh.kontext.presentation.screens.settings.components.AccountTier
 import com.moksh.kontext.presentation.screens.settings.components.InfoDropdownMenu
 import com.moksh.kontext.presentation.screens.settings.components.SettingsItem
 import com.moksh.kontext.presentation.screens.settings.components.ToggleSettingItem
-import com.moksh.kontext.presentation.screens.settings.components.UpgradeCard
+// import com.moksh.kontext.presentation.screens.settings.components.UpgradeCard
 import com.moksh.kontext.presentation.screens.settings.viewmodel.SettingsActions
 import com.moksh.kontext.presentation.screens.settings.viewmodel.SettingsEvents
 import com.moksh.kontext.presentation.screens.settings.viewmodel.SettingsState
@@ -68,8 +68,8 @@ fun SettingsScreen(
         when (event) {
             is SettingsEvents.NavigateBack -> onNavigateBack()
             is SettingsEvents.NavigateToProfile -> onNavigateToProfile()
-            is SettingsEvents.NavigateToBilling -> onNavigateToBilling()
-            is SettingsEvents.NavigateToUpgrade -> onNavigateToUpgrade()
+//            is SettingsEvents.NavigateToBilling -> onNavigateToBilling()
+//            is SettingsEvents.NavigateToUpgrade -> onNavigateToUpgrade()
             is SettingsEvents.NavigateToAuth -> onNavigateToAuth()
             is SettingsEvents.ShowError -> {
                 scope.launch { snackbarHostState.showSnackbar(event.message) }
@@ -169,11 +169,13 @@ fun SettingsScreenContent(
         ) {
             AccountTier(
                 email = state.userEmail,
-                tier = state.userTier,
+                tier = "", // state.userTier,
             )
+            /*
             UpgradeCard(
                 onUpgradeClick = { onAction(SettingsActions.NavigateToUpgrade) }
             )
+            */
             SettingsItem(
                 title = "Profile",
                 icon = {
@@ -185,6 +187,7 @@ fun SettingsScreenContent(
                 },
                 onClick = { onAction(SettingsActions.NavigateToProfile) }
             )
+            /*
             SettingsItem(
                 title = "Billing",
                 icon = {
@@ -196,6 +199,7 @@ fun SettingsScreenContent(
                 },
                 onClick = { onAction(SettingsActions.NavigateToBilling) }
             )
+            */
             HorizontalDivider()
             ToggleSettingItem(
                 title = "Haptic Feedback",
@@ -248,7 +252,7 @@ private fun SettingsScreenPreview() {
         SettingsScreenContent(
             state = SettingsState(
                 userEmail = "someone@gmail.com",
-                userTier = "Free",
+                // userTier = "Free",
                 isHapticFeedbackEnabled = true
             ),
             onAction = { },
@@ -264,7 +268,7 @@ private fun SettingsScreenLoadingPreview() {
         SettingsScreenContent(
             state = SettingsState(
                 userEmail = "someone@gmail.com",
-                userTier = "Premium",
+                // userTier = "Premium",
                 isHapticFeedbackEnabled = false,
                 isLoggingOut = true
             ),

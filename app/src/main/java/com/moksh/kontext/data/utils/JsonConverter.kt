@@ -8,8 +8,14 @@ object JsonConverter {
 
     inline fun <reified T> fromJson(json: String): T? {
         return try {
-            Gson().fromJson(json, object : TypeToken<T>() {}.type)
+            // Use a more R8-safe approach
+            val gson = Gson()
+            val type = object : TypeToken<T>() {}.type
+            gson.fromJson<T>(json, type)
         } catch (e: JsonSyntaxException) {
+            e.printStackTrace()
+            null
+        } catch (e: Exception) {
             e.printStackTrace()
             null
         }

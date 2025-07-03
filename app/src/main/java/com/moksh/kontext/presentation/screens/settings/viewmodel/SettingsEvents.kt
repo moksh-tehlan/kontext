@@ -6,8 +6,9 @@ package com.moksh.kontext.presentation.screens.settings.viewmodel
 sealed interface SettingsEvents {
     data object NavigateBack : SettingsEvents
     data object NavigateToProfile : SettingsEvents
-    data object NavigateToBilling : SettingsEvents
-    data object NavigateToUpgrade : SettingsEvents
+
+    // data object NavigateToBilling : SettingsEvents
+    // data object NavigateToUpgrade : SettingsEvents
     data object NavigateToAuth : SettingsEvents
     data class ShowError(val message: String) : SettingsEvents
     data class ShowSuccess(val message: String) : SettingsEvents
