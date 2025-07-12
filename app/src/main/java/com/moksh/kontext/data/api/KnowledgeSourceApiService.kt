@@ -36,4 +36,10 @@ interface KnowledgeSourceApiService {
         @Path("projectId") projectId: String,
         @Body request: WebUrlRequest
     ): Response<ApiResponse<KnowledgeSource>>
+
+    @GET("api/v1/projects/{projectId}/knowledge/{knowledgeId}/status")
+    suspend fun getKnowledgeSourceStatus(
+        @Path("projectId") projectId: String,
+        @Path("knowledgeId") knowledgeId: String
+    ): Response<ApiResponse<KnowledgeSource>>
 } 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moksh.kontext.BuildConfig
 import com.moksh.kontext.R
 import com.moksh.kontext.domain.manager.CredentialSignInManager
 import com.moksh.kontext.domain.repository.AuthRepository
@@ -54,13 +55,14 @@ class AuthScreenViewModel @Inject constructor(
                 handleGoogleSignIn()
             }
             is AuthScreenActions.OnTermsClick -> {
-                // Handle terms click - open URL or show terms screen
-            }
-            is AuthScreenActions.OnUsagePolicyClick -> {
-                // Handle usage policy click - open URL or show policy screen
+                viewModelScope.launch {
+                    _authEvents.emit(AuthScreenEvents.OpenExternalLink(BuildConfig.TERMS_URL))
+                }
             }
             is AuthScreenActions.OnPrivacyPolicyClick -> {
-                // Handle privacy policy click - open URL or show policy screen
+                viewModelScope.launch {
+                    _authEvents.emit(AuthScreenEvents.OpenExternalLink(BuildConfig.PRIVACY_URL))
+                }
             }
         }
     }

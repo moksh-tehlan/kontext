@@ -1,8 +1,10 @@
 package com.moksh.kontext.domain.repository
 
 import com.moksh.kontext.domain.model.KnowledgeSourceDto
+import com.moksh.kontext.domain.model.KnowledgeSourceStatus
 import com.moksh.kontext.domain.utils.DataError
 import com.moksh.kontext.domain.utils.Result
+import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 interface KnowledgeSourceRepository {
@@ -20,4 +22,9 @@ interface KnowledgeSourceRepository {
         projectId: String,
         webUrl: String
     ): Result<KnowledgeSourceDto, DataError>
+
+    fun pollKnowledgeSourceStatus(
+        projectId: String,
+        knowledgeId: String
+    ): Flow<Result<KnowledgeSourceStatus, DataError>>
 } 

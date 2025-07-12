@@ -6,6 +6,5 @@ sealed interface AuthScreenActions {
     data object OnContinueWithEmail : AuthScreenActions
     data object OnContinueWithGoogle : AuthScreenActions
     data object OnTermsClick : AuthScreenActions
-    data object OnUsagePolicyClick : AuthScreenActions
     data object OnPrivacyPolicyClick : AuthScreenActions
 }

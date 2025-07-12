@@ -9,11 +9,14 @@ import com.moksh.kontext.domain.utils.Result
 import com.moksh.kontext.presentation.core.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -29,6 +32,9 @@ class KnowledgeSourceViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val projectId: String = checkNotNull(savedStateHandle["projectId"])
+
+    // Track active polling jobs
+    private val activePollingJobs = mutableMapOf<String, Job>()
 
     private val _knowledgeSourceState = MutableStateFlow(
         KnowledgeSourceScreenState(projectId = projectId)
@@ -127,6 +133,14 @@ class KnowledgeSourceViewModel @Inject constructor(
             is KnowledgeSourceScreenActions.DeleteKnowledgeSource -> {
                 deleteKnowledgeSource(action.sourceId)
             }
+
+            is KnowledgeSourceScreenActions.StartPollingStatus -> {
+                startPollingKnowledgeStatus(action.knowledgeId)
+            }
+
+            is KnowledgeSourceScreenActions.StopPollingStatus -> {
+                stopPollingKnowledgeStatus(action.knowledgeId)
+            }
         }
     }
 
@@ -145,6 +159,12 @@ class KnowledgeSourceViewModel @Inject constructor(
                         )
                     }
                     _knowledgeSourceEvents.emit(KnowledgeSourceScreenEvents.KnowledgeSourcesLoadedSuccessfully)
+
+                    // Start polling for any knowledge sources that are still processing
+                    result.data.filter { it.status == com.moksh.kontext.domain.model.KnowledgeSourceStatus.PROCESSING }
+                        .forEach { knowledgeSource ->
+                            startPollingKnowledgeStatus(knowledgeSource.id)
+                        }
                 }
 
                 is Result.Error -> {
@@ -197,6 +217,11 @@ class KnowledgeSourceViewModel @Inject constructor(
                     }
                     _knowledgeSourceEvents.emit(KnowledgeSourceScreenEvents.KnowledgeSourceAddedSuccessfully)
                     loadKnowledgeSources() // Refresh the list
+
+                    // Start polling if the knowledge source is in PROCESSING state
+                    if (result.data.status == com.moksh.kontext.domain.model.KnowledgeSourceStatus.PROCESSING) {
+                        startPollingKnowledgeStatus(result.data.id)
+                    }
                 }
 
                 is Result.Error -> {
@@ -226,6 +251,11 @@ class KnowledgeSourceViewModel @Inject constructor(
                     }
                     _knowledgeSourceEvents.emit(KnowledgeSourceScreenEvents.KnowledgeSourceAddedSuccessfully)
                     loadKnowledgeSources() // Refresh the list
+
+                    // Start polling if the knowledge source is in PROCESSING state
+                    if (result.data.status == com.moksh.kontext.domain.model.KnowledgeSourceStatus.PROCESSING) {
+                        startPollingKnowledgeStatus(result.data.id)
+                    }
                 }
 
                 is Result.Error -> {
@@ -282,5 +312,60 @@ class KnowledgeSourceViewModel @Inject constructor(
         } catch (e: Exception) {
             "Web URL"
         }
+    }
+
+    private fun startPollingKnowledgeStatus(knowledgeId: String) {
+        // Stop any existing polling for this knowledge source
+        stopPollingKnowledgeStatus(knowledgeId)
+
+        val pollingJob = knowledgeSourceRepository.pollKnowledgeSourceStatus(projectId, knowledgeId)
+            .onEach { result ->
+                when (result) {
+                    is Result.Success -> {
+                        updateKnowledgeSourceStatus(knowledgeId, result.data)
+
+                        // If processing is complete, remove the job
+                        if (result.data != com.moksh.kontext.domain.model.KnowledgeSourceStatus.PROCESSING) {
+                            activePollingJobs.remove(knowledgeId)
+                        }
+                    }
+
+                    is Result.Error -> {
+                        // Log error but don't show to user as polling should be invisible
+                        activePollingJobs.remove(knowledgeId)
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+
+        activePollingJobs[knowledgeId] = pollingJob
+    }
+
+    private fun stopPollingKnowledgeStatus(knowledgeId: String) {
+        activePollingJobs[knowledgeId]?.cancel()
+        activePollingJobs.remove(knowledgeId)
+    }
+
+    private fun updateKnowledgeSourceStatus(
+        knowledgeId: String,
+        status: com.moksh.kontext.domain.model.KnowledgeSourceStatus
+    ) {
+        _knowledgeSourceState.update { state ->
+            val updatedSources = state.knowledgeSources.map { source ->
+                if (source.id == knowledgeId) {
+                    source.copy(status = status)
+                } else {
+                    source
+                }
+            }
+            state.copy(knowledgeSources = updatedSources)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Cancel all active polling jobs
+        activePollingJobs.values.forEach { it.cancel() }
+        activePollingJobs.clear()
     }
 } 

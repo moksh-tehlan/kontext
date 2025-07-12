@@ -2,13 +2,18 @@ package com.moksh.kontext.presentation.screens.knowledge_source.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,11 +66,65 @@ fun KnowledgeSourceItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Text(
-                text = DateUtils.formatDateString(knowledgeSource.updatedAt),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = DateUtils.formatDateString(knowledgeSource.updatedAt),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+
+                // Status indicator
+                when (knowledgeSource.status) {
+                    KnowledgeSourceStatus.PROCESSING -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(12.dp),
+                            strokeWidth = 1.5.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    KnowledgeSourceStatus.SUCCESS -> {
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.primary,
+                                    CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Success",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(8.dp)
+                            )
+                        }
+                    }
+
+                    KnowledgeSourceStatus.ERROR -> {
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.error,
+                                    CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Error",
+                                tint = MaterialTheme.colorScheme.onError,
+                                modifier = Modifier.size(8.dp)
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         // Delete button
@@ -108,7 +167,7 @@ fun KnowledgeSourceItemPreview() {
                     type = KnowledgeSourceType.DOCUMENT,
                     createdAt = "2025-05-30T12:00:00Z",
                     updatedAt = "2025-05-30T12:00:00Z",
-                    status = KnowledgeSourceStatus.SUCCESS
+                    status = KnowledgeSourceStatus.PROCESSING
                 ),
                 onDelete = {}
             )
@@ -120,7 +179,7 @@ fun KnowledgeSourceItemPreview() {
                     source = "https://example.com",
                     createdAt = "2025-05-30T12:00:00Z",
                     updatedAt = "2025-05-30T12:00:00Z",
-                    status = KnowledgeSourceStatus.SUCCESS
+                    status = KnowledgeSourceStatus.ERROR
                 ),
                 onDelete = {}
             )

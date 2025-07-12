@@ -14,4 +14,6 @@ sealed class KnowledgeSourceScreenActions {
     data class UrlChange(val url: String) : KnowledgeSourceScreenActions()
     data object AddWebUrl : KnowledgeSourceScreenActions()
     data class DeleteKnowledgeSource(val sourceId: String) : KnowledgeSourceScreenActions()
+    data class StartPollingStatus(val knowledgeId: String) : KnowledgeSourceScreenActions()
+    data class StopPollingStatus(val knowledgeId: String) : KnowledgeSourceScreenActions()
 } 

@@ -2,10 +2,7 @@ package com.moksh.kontext.presentation.screens.auth.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,17 +17,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moksh.kontext.R
-import com.moksh.kontext.presentation.core.theme.AuthTextSecondary
 import com.moksh.kontext.presentation.core.theme.KontextTheme
-import java.nio.file.WatchEvent
 
 @Composable
 fun AuthFooter(
     onTermsClick: () -> Unit,
-    onUsagePolicyClick: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -40,7 +33,7 @@ fun AuthFooter(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         val termsText = buildAnnotatedString {
-            append("By continuing, you agree to Anthropic's ")
+            append("By continuing, you agree to our ")
             
             pushStringAnnotation(tag = "consumer_terms", annotation = "consumer_terms")
             withStyle(
@@ -53,22 +46,8 @@ fun AuthFooter(
                 append(stringResource(R.string.consumer_terms))
             }
             pop()
-            
-            append(" and ")
-            
-            pushStringAnnotation(tag = "usage_policy", annotation = "usage_policy")
-            withStyle(
-                style = SpanStyle(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textDecoration = TextDecoration.Underline,
-                    fontWeight = FontWeight.Medium
-                )
-            ) {
-                append(stringResource(R.string.usage_policy))
-            }
-            pop()
-            
-            append(", and acknowledge their ")
+
+            append(" and acknowledge our ")
             
             pushStringAnnotation(tag = "privacy_policy", annotation = "privacy_policy")
             withStyle(
@@ -94,9 +73,6 @@ fun AuthFooter(
                 termsText.getStringAnnotations(tag = "consumer_terms", start = offset, end = offset)
                     .firstOrNull()?.let { onTermsClick() }
                 
-                termsText.getStringAnnotations(tag = "usage_policy", start = offset, end = offset)
-                    .firstOrNull()?.let { onUsagePolicyClick() }
-                
                 termsText.getStringAnnotations(tag = "privacy_policy", start = offset, end = offset)
                     .firstOrNull()?.let { onPrivacyPolicyClick() }
             }
@@ -118,7 +94,6 @@ private fun AuthFooterPreview() {
     KontextTheme(darkTheme = true) {
         AuthFooter(
             onTermsClick = {},
-            onUsagePolicyClick = {},
             onPrivacyPolicyClick = {}
         )
     }
